@@ -1198,7 +1198,7 @@
           strengths: ['团队协作与沟通', '自主学习能力', '组织协调', '服务与应变', '信息整理与可视化表达'],
           hobbies: []
         },
-        certificates: [],
+        certificates: ['certs/cert-1.jpg', 'certs/cert-2.jpg'],
         education: {
           rank: '',
           note: '',
@@ -1986,7 +1986,11 @@
       });
       document.getElementById('certsUpload').addEventListener('change', async e=>{
         const ta = document.getElementById('adminCerts');
-        for (const f of e.target.files){ const u = await fileToDataUrl(f); ta.value = (ta.value.trim() ? ta.value.trim()+'\n' : '') + u; }
+        for (const f of e.target.files){
+          if (f.size > 800 * 1024) flashToast('提示：图片较大，建议将图片放入 certs/ 目录并填写文件名（如 certs/cert-3.jpg）', true);
+          const u = await fileToDataUrl(f);
+          ta.value = (ta.value.trim() ? ta.value.trim()+'\n' : '') + u;
+        }
       });
       document.addEventListener('keydown', e=>{
         if (e.ctrlKey && (e.key === 'm' || e.key === 'M')){
