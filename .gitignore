@@ -1,0 +1,9 @@
+# 备份 / 无关文件
+.workbuddy/
+.workbuddy - 副本/
+index - 副本*.html
+ppt.html
+ppt_assets/
+
+# 压缩包（按需单独提交）
+*.zip
