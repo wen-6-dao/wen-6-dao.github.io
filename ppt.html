@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<meta name="theme-color" content="#0C0A12">
+<title>AI 与 Agent 辅助编程 · 数据全景 2026</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+*{margin:0;padding:0}
+html,body{width:100%;height:100%;background:#0C0A12;color:#F2EFE9;font-family:"PingFang SC","Microsoft YaHei",sans-serif;overflow:hidden;-webkit-font-smoothing:antialiased}
+:root{
+  --bg:#0C0A12;--ink:#F2EFE9;--muted:#9A94AE;--muted-2:#6E6884;
+  --pink:#FF2E88;--purple:#8B3DFF;--orange:#FF5C39;
+  --mono:'JetBrains Mono','SF Mono','Cascadia Mono',ui-monospace,Consolas,monospace;
+  --sans:'PingFang SC','Microsoft YaHei','Noto Sans SC',sans-serif;
+}
+
+/* ===== Stage & scaling ===== */
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#0C0A12;overflow:hidden}
+.deck{position:relative;width:1280px;height:720px;transform-origin:center center}
+
+/* ===== Slide base ===== */
+.slide{position:absolute;inset:0;width:1280px;height:720px;background:#0C0A12;overflow:hidden;opacity:0;visibility:hidden;transition:opacity .35s ease}
+.slide.active{opacity:1;visibility:visible}
+.slide-footer{position:absolute;left:0;right:0;bottom:0;height:60px;padding:0 64px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(255,255,255,.06);font-size:11px;letter-spacing:2px;color:var(--muted-2);font-family:var(--mono);z-index:2}
+.dot-pink{display:inline-block;width:8px;height:8px;background:var(--pink);vertical-align:middle}
+.deco-vline{position:absolute;top:0;width:1px;height:720px;background:rgba(154,148,174,.08)}
+.deco-hline{position:absolute;left:0;width:1280px;height:1px;background:rgba(154,148,174,.07)}
+.glow{position:absolute;border-radius:50%;pointer-events:none}
+.eyebrow{display:inline-flex;align-items:center;gap:12px;font-family:var(--mono);font-size:13px;color:var(--pink);letter-spacing:3px;margin-bottom:10px}
+.bar-grad{height:6px;background:linear-gradient(90deg,var(--pink),var(--purple));border-radius:3px}
+
+/* ===== Controls ===== */
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:14px;padding:14px 16px;z-index:100;background:linear-gradient(180deg,transparent,rgba(0,0,0,.55));font-family:var(--mono)}
+.btn{appearance:none;border:1px solid rgba(255,255,255,.18);background:rgba(20,12,28,.7);color:#F2EFE9;padding:8px 14px;border-radius:8px;font:600 12px/1 var(--mono);letter-spacing:1px;cursor:pointer;transition:all .2s ease;backdrop-filter:blur(8px);min-width:36px;min-height:36px;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{border-color:var(--pink);color:#fff;background:rgba(255,46,136,.18)}
+.btn:disabled{opacity:.35;cursor:not-allowed}
+.btn.primary{background:linear-gradient(90deg,var(--pink),var(--purple));border-color:transparent;color:#fff}
+.progress{flex:1;max-width:520px;height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;cursor:pointer;position:relative}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--pink),var(--purple));transition:width .3s ease;width:10%}
+.page-badge{color:#F2EFE9;font-size:12px;letter-spacing:2px;min-width:70px;text-align:center}
+.zoom-badge{color:var(--muted);font-size:11px;min-width:46px;text-align:right}
+
+/* Dots nav */
+.dots{position:fixed;right:18px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:8px;z-index:100}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.18);cursor:pointer;transition:all .2s}
+.dot:hover{background:rgba(255,255,255,.4)}
+.dot.active{background:var(--pink);box-shadow:0 0 8px rgba(255,46,136,.7);transform:scale(1.4)}
+
+/* Help */
+.help{position:fixed;top:16px;right:16px;color:var(--muted-2);font-family:var(--mono);font-size:11px;letter-spacing:1px;text-align:right;line-height:1.7;z-index:90;opacity:.7;pointer-events:none}
+.help kbd{display:inline-block;padding:1px 6px;border:1px solid rgba(255,255,255,.18);border-radius:4px;background:rgba(255,255,255,.04);color:#F2EFE9;font:inherit;margin:0 2px}
+
+/* Back link */
+.back-link{position:fixed;top:16px;left:16px;color:var(--muted);font-family:var(--mono);font-size:12px;letter-spacing:1px;text-decoration:none;border:1px solid rgba(255,255,255,.14);padding:8px 14px;border-radius:8px;background:rgba(20,12,28,.7);backdrop-filter:blur(8px);z-index:90;transition:all .2s}
+.back-link:hover{border-color:var(--pink);color:#fff}
+
+/* ===== Slide 1 cover ===== */
+.s1-grid{position:absolute;inset:60px 0 60px 0;display:flex;align-items:center;justify-content:space-between;padding:0 64px;z-index:1}
+.s1-left{width:620px}
+.s1-h1{font-family:var(--sans);font-size:62px;font-weight:bold;color:#F2EFE9;line-height:1.18;letter-spacing:-.01em}
+.s1-sub{font-family:var(--sans);font-size:22px;color:var(--muted);margin-top:22px;margin-bottom:40px}
+.s1-foot-block{border-top:1px solid rgba(255,255,255,.10);padding-top:20px;width:520px}
+.s1-foot-block p{font-family:var(--sans);font-size:15px;color:#F2EFE9;line-height:1.7}
+.s1-foot-block .note{font-family:var(--mono);font-size:13px;color:var(--muted-2);margin-top:8px;letter-spacing:1px}
+.s1-right{position:relative;width:430px;height:538px}
+.s1-poster{width:430px;height:538px;object-fit:cover;border:1px solid rgba(255,255,255,.16)}
+.s1-tick{position:absolute;background:var(--pink)}
+.s1-tick.v{width:2px;height:22px}.s1-tick.h{width:22px;height:2px}
+.s1-tick.tr{background:var(--purple)}
+.s1-cap{position:absolute;right:0;bottom:-30px;font-family:var(--mono);font-size:11px;color:var(--muted-2);letter-spacing:2px}
+
+/* ===== Slide 2 agenda ===== */
+.s2-head{height:120px;padding:30px 64px 0}
+.s2-title{font-family:var(--sans);font-size:32px;font-weight:bold;color:#F2EFE9}
+.s2-body{height:540px;display:flex;gap:40px;padding:16px 64px 0}
+.s2-side{width:340px;background:rgba(139,61,255,.10);border-left:3px solid var(--purple);padding:28px;height:480px;display:flex;flex-direction:column}
+.s2-side .kicker{font-family:var(--mono);font-size:12px;color:var(--purple);letter-spacing:3px;margin-bottom:18px}
+.s2-side p{font-family:var(--sans);font-size:19px;font-weight:bold;color:#F2EFE9;line-height:1.6}
+.s2-side .note{border-top:1px solid rgba(255,255,255,.10);padding-top:16px;margin-top:auto;font-weight:normal;font-size:13px;color:var(--muted);line-height:1.6}
+.s2-list{flex:1;height:480px;display:flex;flex-direction:column;justify-content:space-between}
+.s2-item{display:flex;align-items:center;gap:28px;padding-bottom:22px;border-bottom:1px solid rgba(255,255,255,.08)}
+.s2-item:last-child{border-bottom:0;padding-bottom:0}
+.s2-item .num{font-family:var(--mono);font-size:34px;font-weight:bold;color:var(--pink);width:64px;flex-shrink:0}
+.s2-item .h{font-family:var(--sans);font-size:20px;font-weight:bold;color:#F2EFE9}
+.s2-item .d{font-family:var(--sans);font-size:14px;color:var(--muted);margin-top:6px}
+
+/* ===== Slide 3 market (giant number) ===== */
+.s3-head{height:120px;padding:30px 64px 0}
+.s3-title{font-family:var(--sans);font-size:32px;font-weight:bold;color:#F2EFE9}
+.s3-body{height:540px;padding:0 64px;display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative;z-index:1}
+.s3-cap{font-family:var(--mono);font-size:13px;color:var(--muted);letter-spacing:2px;margin-bottom:8px}
+.s3-num{font-family:var(--mono);font-size:128px;font-weight:bold;line-height:1;background:linear-gradient(135deg,var(--pink),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent;display:flex;align-items:baseline;gap:16px}
+.s3-unit{font-family:var(--sans);font-size:40px;font-weight:bold;color:#F2EFE9}
+.s3-wings{display:flex;gap:120px;margin-top:30px;margin-bottom:34px;align-items:center}
+.s3-wing{text-align:center}
+.s3-wing .v{font-family:var(--mono);font-size:40px;font-weight:bold}
+.s3-wing .v.pink{color:var(--pink)}
+.s3-wing .v.ink{color:#F2EFE9}
+.s3-wing .v .sm{font-size:18px}
+.s3-wing .l{font-family:var(--sans);font-size:13px;color:var(--muted);margin-top:8px}
+.s3-sep{width:1px;height:56px;background:rgba(255,255,255,.12)}
+.s3-note{width:980px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-left:3px solid var(--purple);padding:18px 24px}
+.s3-note p{font-family:var(--sans);font-size:14px;color:var(--muted);line-height:1.65}
+.s3-note b{color:var(--purple);font-weight:bold}
+.s3-note i{color:#F2EFE9;font-weight:bold;font-style:normal}
+
+/* ===== Slide 4 landscape (table) ===== */
+.s4-head{height:120px;padding:30px 64px 0}
+.s4-title{font-family:var(--sans);font-size:32px;font-weight:bold;color:#F2EFE9}
+.s4-body{height:540px;padding:8px 64px 0}
+.s4-table{width:100%;height:400px;border-collapse:collapse;background:rgba(255,255,255,.03);font-family:var(--sans);font-size:14px;color:#F2EFE9}
+.s4-table th,.s4-table td{border:1px solid rgba(255,255,255,.08);padding:14px 18px;text-align:left;vertical-align:middle}
+.s4-table th{background:rgba(255,46,136,.18);font-size:15px;font-weight:bold}
+.s4-table td.pink{color:var(--pink);font-weight:bold}
+.s4-table td.purple{color:var(--purple);font-weight:bold}
+.s4-table .src{color:var(--muted)}
+.s4-tip{margin-top:20px;background:rgba(139,61,255,.08);border-left:3px solid var(--purple);padding:14px 20px}
+.s4-tip p{font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.6}
+.s4-tip b{color:var(--purple)}
+
+/* ===== Slide 5 cursor (chart + insights) ===== */
+.s5-head{height:120px;padding:30px 64px 0}
+.s5-title{font-family:var(--sans);font-size:32px;font-weight:bold;color:#F2EFE9}
+.s5-body{height:540px;display:flex;gap:36px;padding:8px 64px 0;position:relative;z-index:1}
+.s5-chart{width:690px;height:470px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);padding:18px}
+.s5-chart-cap{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:2px;margin-bottom:6px}
+.s5-chart img{width:100%;height:410px;object-fit:contain;display:block}
+.s5-insights{flex:1;height:470px;display:flex;flex-direction:column;justify-content:space-between}
+.s5-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:18px;height:146px}
+.s5-card.pink{border-left:3px solid var(--pink)}
+.s5-card.purple{border-left:3px solid var(--purple)}
+.s5-card.ink{border-left:3px solid #F2EFE9}
+.s5-card .v{font-family:var(--mono);font-size:32px;font-weight:bold}
+.s5-card .v.pink{color:var(--pink)}.s5-card .v.purple{color:var(--purple)}.s5-card .v.ink{color:#F2EFE9}
+.s5-card .d{font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.55;margin-top:6px}
+
+/* ===== Slide 6 efficiency (giant left + list right) ===== */
+.s6-head{height:120px;padding:30px 64px 0}
+.s6-title{font-family:var(--sans);font-size:32px;font-weight:bold;color:#F2EFE9}
+.s6-body{height:540px;display:flex;gap:40px;padding:4px 64px 0}
+.s6-big{width:600px;height:470px;background:rgba(255,46,136,.05);border:1px solid rgba(255,46,136,.18);padding:40px;display:flex;flex-direction:column;justify-content:center}
+.s6-big .k{font-family:var(--mono);font-size:12px;color:var(--pink);letter-spacing:3px;margin-bottom:14px}
+.s6-big .n{font-family:var(--mono);font-size:118px;font-weight:bold;line-height:1;background:linear-gradient(135deg,var(--pink),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+.s6-big .h{font-family:var(--sans);font-size:19px;font-weight:bold;color:#F2EFE9;margin-top:16px}
+.s6-big .d{font-family:var(--sans);font-size:14px;color:var(--muted);line-height:1.6;margin-top:10px}
+.s6-list{flex:1;height:470px;display:flex;flex-direction:column;justify-content:space-between}
+.s6-list .row{padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.s6-list .row:last-child{border-bottom:0;padding-bottom:0}
+.s6-list .v{font-family:var(--mono);font-size:42px;font-weight:bold;color:#F2EFE9}
+.s6-list .d{font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.55;margin-top:6px}
+
+/* ===== Slide 7 agent (image left, insights right) ===== */
+.s7-head{height:120px;padding:30px 64px 0}
+.s7-title{font-family:var(--sans);font-size:32px;font-weight:bold;color:#F2EFE9}
+.s7-body{height:540px;display:flex;gap:40px;padding:4px 64px 0;position:relative;z-index:1}
+.s7-img{position:relative;width:500px;height:470px;flex-shrink:0}
+.s7-img img{width:500px;height:470px;object-fit:cover;border:1px solid rgba(255,255,255,.14);display:block}
+.s7-tick{position:absolute;background:var(--pink)}
+.s7-tick.v{width:2px;height:20px}.s7-tick.h{width:20px;height:2px}
+.s7-tick.tr{background:var(--purple)}
+.s7-right{flex:1;height:470px}
+.s7-cap{font-family:var(--mono);font-size:12px;color:var(--purple);letter-spacing:2px;margin-bottom:8px}
+.s7-num{font-family:var(--mono);font-size:46px;font-weight:bold;background:linear-gradient(135deg,var(--pink),var(--purple));-webkit-background-clip:text;background-clip:text;color:transparent}
+.s7-desc{font-family:var(--sans);font-size:14px;color:var(--muted);line-height:1.6;margin-top:8px;margin-bottom:20px}
+.s7-row{display:flex;gap:14px;align-items:flex-start;border-top:1px solid rgba(255,255,255,.08);padding:14px 0}
+.s7-row.last{border-bottom:1px solid rgba(255,255,255,.08)}
+.s7-ic{width:22px;height:22px;flex-shrink:0;fill:var(--pink)}
+.s7-row p{font-family:var(--sans);font-size:14px;color:#F2EFE9;line-height:1.55}
+.s7-row b{font-weight:bold}
+.s7-row .hl{color:var(--pink);font-weight:bold}
+
+/* ===== Slide 8 trust (vs split) ===== */
+.s8-head{height:120px;padding:30px 64px 0}
+.s8-title{font-family:var(--sans);font-size:32px;font-weight:bold;color:#F2EFE9}
+.s8-body{height:540px;display:flex;padding:4px 64px 0;position:relative;z-index:1}
+.s8-col{flex:1;height:460px;padding:26px}
+.s8-col.l{background:rgba(139,61,255,.07);border:1px solid rgba(139,61,255,.25)}
+.s8-col.r{background:rgba(255,46,136,.06);border:1px solid rgba(255,46,136,.28)}
+.s8-col .kicker{font-family:var(--mono);font-size:12px;letter-spacing:3px;margin-bottom:18px}
+.s8-col.l .kicker{color:var(--purple)}
+.s8-col.r .kicker{color:var(--pink)}
+.s8-row2{display:flex;align-items:center;gap:18px;margin-bottom:16px}
+.s8-row2:last-child{margin-bottom:0}
+.s8-row2 .v{font-family:var(--mono);font-size:34px;font-weight:bold;width:118px;flex-shrink:0}
+.s8-col.l .v{color:var(--purple)}
+.s8-col.r .v{color:var(--orange)}
+.s8-row2 .d{font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.5;flex:1}
+.s8-vs{width:80px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.s8-vs .ln{width:1px;height:150px;background:rgba(255,255,255,.14)}
+.s8-vs .circ{width:52px;height:52px;border-radius:26px;background:#0C0A12;border:1px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;margin:12px 0}
+.s8-vs .circ span{font-family:var(--mono);font-size:15px;font-weight:bold;color:#F2EFE9;letter-spacing:1px}
+
+/* ===== Slide 9 playbook ===== */
+.s9-head{height:120px;padding:30px 64px 0}
+.s9-title{font-family:var(--sans);font-size:32px;font-weight:bold;color:#F2EFE9}
+.s9-body{height:540px;display:flex;gap:40px;padding:4px 64px 0}
+.s9-side{width:320px;background:rgba(255,92,57,.07);border-left:3px solid var(--orange);padding:26px;height:480px;display:flex;flex-direction:column}
+.s9-side .kicker{font-family:var(--mono);font-size:12px;color:var(--orange);letter-spacing:3px;margin-bottom:18px}
+.s9-side p{font-family:var(--sans);font-size:19px;font-weight:bold;color:#F2EFE9;line-height:1.6}
+.s9-side .note{border-top:1px solid rgba(255,255,255,.10);padding-top:16px;margin-top:auto;font-weight:normal;font-size:13px;color:var(--muted);line-height:1.7}
+.s9-list{flex:1;height:480px;display:flex;flex-direction:column;justify-content:space-between}
+.s9-row{display:flex;gap:24px;align-items:flex-start;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.s9-row:last-child{border-bottom:0;padding-bottom:0}
+.s9-row .n{font-family:var(--mono);font-size:26px;font-weight:bold;color:var(--orange);width:46px;flex-shrink:0}
+.s9-row .h{font-family:var(--sans);font-size:17px;font-weight:bold;color:#F2EFE9}
+.s9-row .d{font-family:var(--sans);font-size:13px;color:var(--muted);line-height:1.55;margin-top:4px}
+
+/* ===== Slide 10 sources ===== */
+.s10-quote{height:210px;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:0 64px;position:relative;z-index:1}
+.s10-q-text{font-family:var(--sans);font-size:40px;font-weight:bold;color:#F2EFE9;text-align:center;line-height:1.25}
+.s10-cap{font-family:var(--mono);font-size:13px;color:var(--muted-2);letter-spacing:3px;margin-top:14px}
+.s10-list-wrap{height:380px;display:flex;gap:48px;padding:0 64px;position:relative;z-index:1}
+.s10-list{flex:1;padding-top:20px}
+.s10-list.l{border-top:2px solid var(--pink)}
+.s10-list.r{border-top:2px solid var(--purple)}
+.s10-list p{font-family:var(--sans);font-size:14px;color:var(--muted);line-height:2.05}
+.s10-note{height:70px;padding:0 64px;position:relative;z-index:1}
+.s10-note p{font-family:var(--sans);font-size:12px;color:var(--muted-2);line-height:1.6}
+
+@media (max-width:900px){.help{display:none}.dots{display:none}.nav{flex-wrap:wrap}}
+@media (prefers-reduced-motion:reduce){.slide{transition:none}}
+</style>
+</head>
+<body>
+
+<a class="back-link" href="index.html">← 返回简历</a>
+<div class="help">
+  <kbd>←</kbd><kbd>→</kbd> 翻页 · <kbd>F</kbd> 全屏 · <kbd>+</kbd><kbd>−</kbd> 缩放 · <kbd>0</kbd> 适配 · <kbd>Home/End</kbd> 首末
+</div>
+<nav class="dots" id="dots"></nav>
+
+<div class="stage">
+<div class="deck" id="deck">
+
+<!-- ============ Slide 1: Cover ============ -->
+<section class="slide active" data-slide="1">
+  <div class="deco-vline" style="left:320px"></div>
+  <div class="deco-vline" style="left:640px"></div>
+  <div class="deco-vline" style="left:960px"></div>
+  <div class="deco-hline" style="top:240px"></div>
+  <div class="deco-hline" style="top:480px"></div>
+  <div class="glow" style="left:-120px;top:-120px;width:520px;height:520px;background:radial-gradient(circle,rgba(255,46,136,.16) 0%,rgba(255,46,136,0) 70%);"></div>
+
+  <div class="s1-grid">
+    <div class="s1-left">
+      <div class="eyebrow"><span class="dot-pink"></span><span style="font-family:var(--mono);font-size:13px;letter-spacing:3px;color:var(--pink)">DATA PANORAMA · 2026</span></div>
+      <div class="bar-grad" style="width:64px;margin-bottom:28px"></div>
+      <h1 class="s1-h1">AI 与 Agent<br>辅助编程</h1>
+      <p class="s1-sub">用数据看懂正在发生的变革</p>
+      <div class="s1-foot-block">
+        <p>市场规模 · 工具格局 · 效率证据 · 开发者态度</p>
+        <p class="note">基于 2022–2026 年公开调研与厂商披露数据</p>
+      </div>
+    </div>
+    <div class="s1-right">
+      <img class="s1-poster" src="ppt_assets/cover_poster.png" alt="">
+      <div class="s1-tick v" style="left:-10px;top:-10px"></div>
+      <div class="s1-tick h" style="left:-10px;top:-10px"></div>
+      <div class="s1-tick v tr" style="right:-10px;bottom:-10px"></div>
+      <div class="s1-tick h tr" style="right:-10px;bottom:-10px"></div>
+      <div class="s1-cap">STYLE REF · CYBERPUNK POSTER</div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div><span class="dot-pink"></span><span>AI × AGENT CODING · DATA PANORAMA 2026</span></div>
+    <div>01 / 10</div>
+  </div>
+</section>
+
+<!-- ============ Slide 2: Agenda ============ -->
+<section class="slide" data-slide="2">
+  <div class="s2-head">
+    <div class="eyebrow"><span class="dot-pink"></span><span style="font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--pink)">AGENDA · 议程</span></div>
+    <h2 class="s2-title">四个问题，看清 AI 编程的现状</h2>
+  </div>
+  <div class="s2-body">
+    <div class="s2-side">
+      <div class="kicker">FOUR QUESTIONS</div>
+      <p>从市场、工具、效率、态度四个维度，用公开数据拼出 AI 编程的全貌。</p>
+      <div class="note">之后每一页，对应回答其中一个问题。</div>
+    </div>
+    <div class="s2-list">
+      <div class="s2-item">
+        <div class="num">01</div>
+        <div>
+          <div class="h">市场：AI 编程是风口，还是主赛道？</div>
+          <div class="d">多家机构预测的 2030 年规模与年复合增长率</div>
+        </div>
+      </div>
+      <div class="s2-item">
+        <div class="num">02</div>
+        <div>
+          <div class="h">工具：谁在领跑，增长有多快？</div>
+          <div class="d">Copilot / Cursor / Claude Code 的用户与收入里程碑</div>
+        </div>
+      </div>
+      <div class="s2-item">
+        <div class="num">03</div>
+        <div>
+          <div class="h">效率：AI 与 Agent 真的更快、更好吗？</div>
+          <div class="d">随机对照实验与独立学术研究的证据</div>
+        </div>
+      </div>
+      <div class="s2-item">
+        <div class="num">04</div>
+        <div>
+          <div class="h">态度：开发者用得多，信得过吗？</div>
+          <div class="d">采纳率与信任度的温差，以及怎么用好</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div><span class="dot-pink"></span><span>AI × AGENT CODING · DATA PANORAMA 2026</span></div>
+    <div>02 / 10</div>
+  </div>
+</section>
+
+<!-- ============ Slide 3: Market ============ -->
+<section class="slide" data-slide="3">
+  <div class="glow" style="left:380px;top:60px;width:560px;height:560px;background:radial-gradient(circle,rgba(139,61,255,.14) 0%,rgba(139,61,255,0) 70%);"></div>
+
+  <div class="s3-head">
+    <div class="eyebrow"><span class="dot-pink"></span><span style="font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--pink)">01 · MARKET / 市场</span></div>
+    <h2 class="s3-title">AI 编程市场：2030 年预计达 260 亿美元</h2>
+  </div>
+
+  <div class="s3-body">
+    <div class="s3-cap">2030 年全球 AI 代码工具市场规模 · GRAND VIEW RESEARCH</div>
+    <div class="s3-num">260<span class="s3-unit">亿美元</span></div>
+    <div class="s3-wings">
+      <div class="s3-wing"><div class="v pink">27.1%</div><div class="l">至 2030 年的年复合增长率（CAGR）</div></div>
+      <div class="s3-sep"></div>
+      <div class="s3-wing"><div class="v ink">48.6<span class="sm"> 亿美元</span></div><div class="l">2023 年市场基准规模</div></div>
+    </div>
+    <div class="s3-note"><p><b>口径说明　</b>不同机构界定不同：MarketsandMarkets 预测 2032 年达 1270 亿美元（偏乐观口径）；HHeuristics 预测 2030 年达 240 亿美元。多家机构一致区间：<i>2030 年 240–320 亿美元、年复合增长 25% 以上</i>——主赛道，而非风口。</p></div>
+  </div>
+
+  <div class="slide-footer">
+    <div><span class="dot-pink"></span><span>AI × AGENT CODING · DATA PANORAMA 2026</span></div>
+    <div>03 / 10</div>
+  </div>
+</section>
+
+<!-- ============ Slide 4: Landscape (table) ============ -->
+<section class="slide" data-slide="4">
+  <div class="s4-head">
+    <div class="eyebrow"><span class="dot-pink"></span><span style="font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--pink)">02 · LANDSCAPE / 工具</span></div>
+    <h2 class="s4-title">工具格局：三家领跑，Agent 元年已至</h2>
+  </div>
+  <div class="s4-body">
+    <table class="s4-table">
+      <thead>
+        <tr><th>工具</th><th>关键指标</th><th>里程碑（来源）</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="pink">GitHub Copilot</td><td>2000 万+ 用户；90%+ 财富 100 强采用</td><td class="src">微软 FY25 Q4 财报披露，2025-07</td></tr>
+        <tr><td class="pink">Cursor</td><td>210 万+ 用户；ARR 10 亿美元</td><td class="src">24 个月达成，B2B 软件史上最快（2025-11）</td></tr>
+        <tr><td class="pink">Claude Code</td><td>ARR 10 亿美元；用户周均使用约 20 小时</td><td class="src">公开发布后约 6 个月达成（2025-05 发布）</td></tr>
+        <tr><td class="purple">OpenAI Codex</td><td>开源仓库贡献者增速第 3 名</td><td class="src">GitHub Octoverse 2025</td></tr>
+        <tr><td class="purple">Aider（开源）</td><td>最近版本 88% 代码由其 Agent 自行编写</td><td class="src">「用 AI 开发 AI」代表案例（arXiv 2025）</td></tr>
+      </tbody>
+    </table>
+    <div class="s4-tip"><p><b>口径提示　</b>Copilot 为累计用户数，Cursor 为产品用户数，Claude Code 为 Anthropic 抽样分析会话数——口径不一，不宜直接横比。</p></div>
+  </div>
+  <div class="slide-footer">
+    <div><span class="dot-pink"></span><span>AI × AGENT CODING · DATA PANORAMA 2026</span></div>
+    <div>04 / 10</div>
+  </div>
+</section>
+
+<!-- ============ Slide 5: Cursor Growth ============ -->
+<section class="slide" data-slide="5">
+  <div class="glow" style="right:-100px;top:100px;width:460px;height:460px;background:radial-gradient(circle,rgba(255,46,136,.10) 0%,rgba(255,46,136,0) 70%);"></div>
+
+  <div class="s5-head">
+    <div class="eyebrow"><span class="dot-pink"></span><span style="font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--pink)">02 · GROWTH / 增速</span></div>
+    <h2 class="s5-title">增速实例：Cursor 一年内从 1 亿到 20 亿美元年收入</h2>
+  </div>
+
+  <div class="s5-body">
+    <div class="s5-chart">
+      <div class="s5-chart-cap">CURSOR ARR TRAJECTORY · 年化收入（百万美元）</div>
+      <img src="ppt_assets/cursor_chart.png" alt="Cursor ARR 轨迹">
+    </div>
+    <div class="s5-insights">
+      <div class="s5-card pink">
+        <div class="v pink">24 个月</div>
+        <div class="d">达成 10 亿美元 ARR，B2B 软件史上最快（Slack 5 年、Zoom 4 年）</div>
+      </div>
+      <div class="s5-card purple">
+        <div class="v purple">36%</div>
+        <div class="d">免费转付费转化率（行业均值 2–5%）；50%+ 财富 500 强企业使用</div>
+      </div>
+      <div class="s5-card ink">
+        <div class="v ink">≈300 人</div>
+        <div class="d">团队规模仅约 300 人；2026 年初 ARR 约 20 亿美元</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div><span class="dot-pink"></span><span>来源：CNBC DISRUPTOR 50（2026-05）· DEV COMMUNITY（2026-02）· ARR 为厂商披露口径</span></div>
+    <div>05 / 10</div>
+  </div>
+</section>
+
+<!-- ============ Slide 6: Efficiency ============ -->
+<section class="slide" data-slide="6">
+  <div class="s6-head">
+    <div class="eyebrow"><span class="dot-pink"></span><span style="font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--pink)">03 · EVIDENCE / 效率</span></div>
+    <h2 class="s6-title">效率证据：更快之外，质量也在提升</h2>
+  </div>
+  <div class="s6-body">
+    <div class="s6-big">
+      <div class="k">GITHUB 2022 · 随机对照实验</div>
+      <div class="n">55%</div>
+      <div class="h">开发者完成任务提速 55%</div>
+      <div class="d">任务完成率 78% vs 未用 Copilot 的 70%——速度与完成率同时改善</div>
+    </div>
+    <div class="s6-list">
+      <div class="row">
+        <div class="v">+53.2%</div>
+        <div class="d">通过全部单元测试的概率提升（GitHub 2024 RCT，202 名 5 年以上经验开发者）</div>
+      </div>
+      <div class="row">
+        <div class="v">13.6%</div>
+        <div class="d">错误密度更低：出现 1 处错误前，平均可多写 13.6% 的代码</div>
+      </div>
+      <div class="row">
+        <div class="v">80%</div>
+        <div class="d">报告 AI 提升了生产力（Google Cloud DORA 2025）</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">
+    <div><span class="dot-pink"></span><span>更多印证：92% 美国开发者已用 AI 编程工具（GITHUB 2023）· 69% 认为提效（SO 2025）· 74% 效率提升（JETBRAINS 2025）</span></div>
+    <div>06 / 10</div>
+  </div>
+</section>
+
+<!-- ============ Slide 7: Agent Adoption ============ -->
+<section class="slide" data-slide="7">
+  <div class="deco-vline" style="left:320px;background:rgba(154,148,174,.10)"></div>
+  <div class="deco-vline" style="left:960px;background:rgba(154,148,174,.10)"></div>
+
+  <div class="s7-head">
+    <div class="eyebrow"><span class="dot-pink"></span><span style="font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--pink)">03 · ADOPTION / 落地</span></div>
+    <h2 class="s7-title">Agent 编程正在进入真实代码库</h2>
+  </div>
+
+  <div class="s7-body">
+    <div class="s7-img">
+      <img src="ppt_assets/agent_hand.png" alt="">
+      <div class="s7-tick v" style="left:-8px;top:-8px"></div>
+      <div class="s7-tick h" style="left:-8px;top:-8px"></div>
+      <div class="s7-tick v tr" style="right:-8px;bottom:-8px"></div>
+      <div class="s7-tick h tr" style="right:-8px;bottom:-8px"></div>
+    </div>
+    <div class="s7-right">
+      <div class="s7-cap">ARXIV 2025 · 12.9 万个 GITHUB 项目抽样</div>
+      <div class="s7-num">15.85%–22.60%</div>
+      <div class="s7-desc">的项目已出现编程 Agent 使用痕迹（截至 2025-10）；Agent 提交的代码块普遍大于人工，聚焦新功能与缺陷修复</div>
+
+      <div class="s7-row">
+        <svg class="s7-ic" viewBox="0 0 24 24"><path d="M4 8h16v10H4zM2 12h2v4H2zm18 0h2v4h-2zM9 4h6v2H9zM7 6h10v2H7z"/></svg>
+        <p><b>Aider</b>：最近版本 <span class="hl">88%</span> 的代码由其 Agent 自行编写——用 AI 开发 AI</p>
+      </div>
+      <div class="s7-row">
+        <svg class="s7-ic" viewBox="0 0 24 24"><path d="M9 18l-6-6 6-6m6 12l6-6-6-6"/></svg>
+        <p><b>Copilot 评审 Agent</b>：每月执行<span class="hl">数百万次</span>代码评审</p>
+      </div>
+      <div class="s7-row last">
+        <svg class="s7-ic" viewBox="0 0 24 24"><path d="M13 2L3 14h7l-1 8 10-12h-7z"/></svg>
+        <p><b>Carvana / EY</b>：需求规格到生产代码，从数小时缩至<span class="hl">数分钟</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div><span class="dot-pink"></span><span>CLAUDE CODE 用户周均约 20 小时 · 2025H2–2026H1 采用率翻倍 · 企业引语属厂商披露</span></div>
+    <div>07 / 10</div>
+  </div>
+</section>
+
+<!-- ============ Slide 8: Trust Gap ============ -->
+<section class="slide" data-slide="8">
+  <div class="deco-vline" style="left:320px;background:rgba(154,148,174,.07)"></div>
+  <div class="deco-vline" style="left:960px;background:rgba(154,148,174,.07)"></div>
+
+  <div class="s8-head">
+    <div class="eyebrow"><span class="dot-pink"></span><span style="font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--pink)">04 · SENTIMENT / 态度</span></div>
+    <h2 class="s8-title">用得多，但信任仍缺位</h2>
+  </div>
+
+  <div class="s8-body">
+    <div class="s8-col l">
+      <div class="kicker">采纳率 · ADOPTION ↗</div>
+      <div class="s8-row2"><div class="v">90%</div><div class="d">技术从业者工作中使用 AI（DORA 2025，同比 +14pp）</div></div>
+      <div class="s8-row2"><div class="v">85%</div><div class="d">开发者经常使用 AI 工具编码（JetBrains 2025）</div></div>
+      <div class="s8-row2"><div class="v">84%</div><div class="d">使用或计划使用 AI 工具（Stack Overflow 2025）</div></div>
+      <div class="s8-row2"><div class="v">51%</div><div class="d">专业开发者每天使用 AI（Stack Overflow 2025）</div></div>
+    </div>
+
+    <div class="s8-vs">
+      <div class="ln"></div>
+      <div class="circ"><span>VS</span></div>
+      <div class="ln"></div>
+    </div>
+
+    <div class="s8-col r">
+      <div class="kicker">信任缺口 · TRUST GAP ↘</div>
+      <div class="s8-row2"><div class="v">25%</div><div class="d">高度信任 AI 输出（DORA 2025；30% 几乎不信任）</div></div>
+      <div class="s8-row2"><div class="v">46%</div><div class="d">不信任 AI 准确性，仅 33% 信任（Stack Overflow 2025）</div></div>
+      <div class="s8-row2"><div class="v">66%</div><div class="d">最大痛点：「接近正确，但不对」（Stack Overflow 2025）</div></div>
+      <div class="s8-row2"><div class="v">52%</div><div class="d">不使用 Agent 或只用简单 AI 工具（Stack Overflow 2025）</div></div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div><span class="dot-pink"></span><span>正面情绪 70%+（2023–24）→ 60%（2025）：使用在普及，信任在流失</span></div>
+    <div>08 / 10</div>
+  </div>
+</section>
+
+<!-- ============ Slide 9: Playbook ============ -->
+<section class="slide" data-slide="9">
+  <div class="s9-head">
+    <div class="eyebrow"><span class="dot-pink"></span><span style="font-family:var(--mono);font-size:12px;letter-spacing:3px;color:var(--orange)">04 · PLAYBOOK / 行动</span></div>
+    <h2 class="s9-title">从「要不要用」到「怎么用好」</h2>
+  </div>
+
+  <div class="s9-body">
+    <div class="s9-side">
+      <div class="kicker">PLAYBOOK · 5 MOVES</div>
+      <p>数据给出的不是「买哪个工具」，而是一套落地方法。</p>
+      <div class="note">试点 → 度量 → 补协作<br>→ 建技能 → 护成长</div>
+    </div>
+    <div class="s9-list">
+      <div class="s9-row"><div class="n">01</div><div><div class="h">加速器，不是自动驾驶</div><div class="d">以人审、测试、版本控制兜底；DORA 2025 的结论是「信任但验证」</div></div></div>
+      <div class="s9-row"><div class="n">02</div><div><div class="h">先度量，再推广</div><div class="d">用基线对照评估收益；GitHub 的随机对照实验方法可直接复用到团队</div></div></div>
+      <div class="s9-row"><div class="n">03</div><div><div class="h">补上协作短板</div><div class="d">仅 17% 认为 Agent 改善了团队协作（SO 2025）——需要流程、规范与工具配套</div></div></div>
+      <div class="s9-row"><div class="n">04</div><div><div class="h">把 AI 纳入技能体系</div><div class="d">68% 的开发者认为 AI 熟练度将成为工作硬性要求（JetBrains 2025）</div></div></div>
+      <div class="s9-row"><div class="n">05</div><div><div class="h">保护初级开发者成长</div><div class="d">专家级会话成功率 28–33%，新手仅约 15%（Anthropic 2026）——需为新手保留成长路径</div></div></div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <div><span class="dot-pink"></span><span>AI × AGENT CODING · DATA PANORAMA 2026</span></div>
+    <div>09 / 10</div>
+  </div>
+</section>
+
+<!-- ============ Slide 10: Sources ============ -->
+<section class="slide" data-slide="10">
+  <div class="deco-vline" style="left:320px;background:rgba(154,148,174,.08)"></div>
+  <div class="deco-vline" style="left:640px;background:rgba(154,148,174,.08)"></div>
+  <div class="deco-vline" style="left:960px;background:rgba(154,148,174,.08)"></div>
+  <div class="glow" style="right:-100px;bottom:-100px;width:420px;height:420px;background:radial-gradient(circle,rgba(139,61,255,.12) 0%,rgba(139,61,255,0) 70%);"></div>
+
+  <div class="s10-quote">
+    <div class="bar-grad" style="width:48px;height:5px;margin-bottom:20px"></div>
+    <div class="s10-q-text">信任但验证——所有数字都可回溯</div>
+    <div class="s10-cap">TRUST, BUT VERIFY · SOURCES 2022–2026</div>
+  </div>
+
+  <div class="s10-list-wrap">
+    <div class="s10-list l">
+      <p>· Grand View Research — AI Code Tools Market（2026）<br>
+      · HHeuristics — AI Coding Agents Market（2026）<br>
+      · MarketsandMarkets — AI Code Assistants（2026）<br>
+      · 微软 FY25 Q4 财报 / GitHub CEO 声明（2025）<br>
+      · GitHub Octoverse 2025<br>
+      · GitHub Research — Copilot 效率与代码质量（2022–2024）</p>
+    </div>
+    <div class="s10-list r">
+      <p>· Stack Overflow Developer Survey 2025<br>
+      · JetBrains State of Developer Ecosystem 2025<br>
+      · Google Cloud DORA 2024 / 2025<br>
+      · Anthropic — Claude Code 经济研究（2026）<br>
+      · arXiv — Agentic Much? Coding Agents on GitHub（2025）<br>
+      · GitHub 2023 开发者调查（92% 采用率）</p>
+    </div>
+  </div>
+
+  <div class="s10-note">
+    <p>说明：厂商披露数据与独立调研并存，引用时建议标注机构与年份；详细链接见配套资料《AI编程与Agent编程数据资料.md》。</p>
+  </div>
+
+  <div class="slide-footer">
+    <div><span class="dot-pink"></span><span>AI × AGENT CODING · DATA PANORAMA 2026</span></div>
+    <div>10 / 10</div>
+  </div>
+</section>
+
+</div>
+</div>
+
+<nav class="nav">
+  <button class="btn" id="prev" aria-label="上一页">← Prev</button>
+  <button class="btn primary" id="next" aria-label="下一页">Next →</button>
+  <div class="progress" id="progress"><div class="progress-fill" id="progressFill"></div></div>
+  <span class="page-badge" id="pageBadge">01 / 10</span>
+  <button class="btn" id="zoomOut" aria-label="缩小">−</button>
+  <span class="zoom-badge" id="zoomBadge">fit</span>
+  <button class="btn" id="zoomIn" aria-label="放大">+</button>
+  <button class="btn" id="reset" aria-label="适配">Fit</button>
+  <button class="btn" id="full" aria-label="全屏">⛶ Full</button>
+</nav>
+
+<script>
+(function(){
+  const TOTAL = 10;
+  let cur = 1;
+  let zoom = 0; // 0 = fit, else scale
+  let userZoom = 1;
+
+  const deck = document.getElementById('deck');
+  const slides = document.querySelectorAll('.slide');
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const progress = document.getElementById('progress');
+  const progressFill = document.getElementById('progressFill');
+  const pageBadge = document.getElementById('pageBadge');
+  const zoomBadge = document.getElementById('zoomBadge');
+  const zoomIn = document.getElementById('zoomIn');
+  const zoomOut = document.getElementById('zoomOut');
+  const reset = document.getElementById('reset');
+  const full = document.getElementById('full');
+  const dotsWrap = document.getElementById('dots');
+
+  // build dots
+  for (let i = 1; i <= TOTAL; i++){
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 1 ? ' active' : '');
+    d.title = '第 ' + String(i).padStart(2,'0') + ' 页';
+    d.addEventListener('click', () => go(i));
+    dotsWrap.appendChild(d);
+  }
+  const dots = dotsWrap.querySelectorAll('.dot');
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+
+  function go(n){
+    if (n < 1 || n > TOTAL) return;
+    cur = n;
+    slides.forEach(s => s.classList.toggle('active', Number(s.dataset.slide) === cur));
+    dots.forEach((d, i) => d.classList.toggle('active', i + 1 === cur));
+    pageBadge.textContent = pad(cur) + ' / ' + pad(TOTAL);
+    progressFill.style.width = (cur / TOTAL * 100) + '%';
+    prev.disabled = cur === 1;
+    next.disabled = cur === TOTAL;
+  }
+
+  function fit(){
+    zoom = 0;
+    userZoom = 1;
+    apply();
+  }
+  function apply(){
+    let scale;
+    if (zoom === 0){
+      const W = window.innerWidth, H = window.innerHeight;
+      scale = Math.min(W / 1280, H / 720) * 0.96;
+    } else {
+      scale = zoom * userZoom;
+    }
+    scale = Math.max(0.25, Math.min(scale, 3));
+    deck.style.transform = 'scale(' + scale + ')';
+    if (zoom === 0){
+      zoomBadge.textContent = Math.round(scale * 100) + '%';
+    } else {
+      zoomBadge.textContent = Math.round(zoom * 100) + '%';
+    }
+  }
+
+  function zoomStep(dir){
+    if (zoom === 0){
+      zoom = Math.min(window.innerWidth / 1280, window.innerHeight / 720) * 0.96;
+      zoom = Math.max(0.25, zoom);
+    }
+    zoom = Math.max(0.25, Math.min(zoom + dir * 0.15, 3));
+    apply();
+  }
+
+  prev.addEventListener('click', () => go(cur - 1));
+  next.addEventListener('click', () => go(cur + 1));
+  zoomIn.addEventListener('click', () => zoomStep(1));
+  zoomOut.addEventListener('click', () => zoomStep(-1));
+  reset.addEventListener('click', fit);
+  full.addEventListener('click', () => {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+    else document.exitFullscreen();
+  });
+
+  progress.addEventListener('click', e => {
+    const r = progress.getBoundingClientRect();
+    const ratio = (e.clientX - r.left) / r.width;
+    go(Math.round(ratio * TOTAL - 0.4) + 1);
+  });
+
+  // keyboard
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(cur + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(cur - 1); }
+    else if (e.key === 'Home') { go(1); }
+    else if (e.key === 'End') { go(TOTAL); }
+    else if (e.key === '+' || e.key === '=') zoomStep(1);
+    else if (e.key === '-' || e.key === '_') zoomStep(-1);
+    else if (e.key === '0') fit();
+    else if (e.key === 'f' || e.key === 'F') full.click();
+  });
+
+  // click left/right halves for nav
+  document.querySelector('.stage').addEventListener('click', e => {
+    if (e.target.closest('.nav') || e.target.closest('.dots') || e.target.closest('.help') || e.target.closest('.back-link')) return;
+    const x = e.clientX, w = window.innerWidth;
+    if (x > w * 0.7) go(cur + 1);
+    else if (x < w * 0.3) go(cur - 1);
+  });
+
+  // wheel (debounced)
+  let wheelLock = false;
+  document.addEventListener('wheel', e => {
+    if (wheelLock) return;
+    if (Math.abs(e.deltaY) < 30) return;
+    wheelLock = true;
+    go(cur + (e.deltaY > 0 ? 1 : -1));
+    setTimeout(() => wheelLock = false, 700);
+  }, { passive: true });
+
+  // touch swipe
+  let touchStart = null;
+  document.addEventListener('touchstart', e => { touchStart = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (touchStart == null) return;
+    const dx = (e.changedTouches[0].clientX - touchStart);
+    if (Math.abs(dx) > 60) go(cur + (dx < 0 ? 1 : -1));
+    touchStart = null;
+  });
+
+  window.addEventListener('resize', apply);
+  go(1);
+  apply();
+})();
+</script>
+</body>
+</html>
