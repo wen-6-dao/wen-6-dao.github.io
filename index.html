@@ -6,7 +6,7 @@
     ============================================================
     技术方案：单文件实现（HTML + CSS + JavaScript），无外部依赖。
     页面结构：Hero → 关于我 → 教育 → 技能 → 经历 → 项目 → 特长 → 证书 → 联系。
-    数据说明：默认内容为占位框架；点击右上角 ⚙️（或 Ctrl+M）可编辑，数据保存在浏览器 localStorage。
+    数据说明：点击右上角 ⚙️（或 Ctrl+M）可进入内容管理（需管理员密码），数据保存在浏览器 localStorage。
     使用方式：直接双击打开本文件；🖨️ 按钮可导出 PDF。
     部署方法：将本文件上传至 GitHub Pages / Vercel / Netlify / Gitee Pages 即可获得线上访问地址。
   -->
@@ -484,9 +484,16 @@
     .admin-panel .hint{color:var(--text-3);font-size:.78rem;margin-bottom:14px;line-height:1.55}
     .admin-panel label{display:block;font-size:.78rem;font-weight:600;color:var(--text-2);margin-top:12px;margin-bottom:4px}
     .admin-panel input[type=text],.admin-panel textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font:inherit;font-size:.84rem;font-family:var(--font-mono)}
+    .admin-panel input[type=password],.admin-lock-panel input[type=password]{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);font:inherit;font-size:.9rem;margin-top:4px}
     .admin-panel textarea{resize:vertical;min-height:60px;line-height:1.5}
     .admin-panel input[type=file]{margin-top:6px;font-size:.76rem;color:var(--text-2)}
     .admin-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;align-items:center}
+    .admin-lock{position:fixed;inset:0;background:rgba(10,4,20,.65);z-index:300;display:none;align-items:center;justify-content:center}
+    .admin-lock.open{display:flex}
+    .admin-lock-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:26px;width:100%;max-width:360px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+    .admin-lock-panel h3{font-size:1.05rem;margin-bottom:4px;color:var(--ink)}
+    .admin-lock-panel .hint{color:var(--text-3);font-size:.78rem;margin-bottom:12px;line-height:1.55}
+    .admin-lock-panel .admin-actions{margin-top:16px}
 
     /* ========== Cyberpunk neon utilities ========== */
     .neon-text{background:var(--neon-grad);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 8px rgba(244,114,182,.5))}
@@ -951,6 +958,19 @@
     <img class="lightbox-img" id="lightboxImg" src="" alt="查看大图">
   </div>
 
+  <!-- ====== Admin lock ====== -->
+  <div class="admin-lock" id="adminLock" role="dialog" aria-label="管理员验证">
+    <div class="admin-lock-panel">
+      <h3>管理员验证</h3>
+      <p class="hint" id="adminLockMsg">请输入管理密码</p>
+      <input type="password" id="adminLockInput" autocomplete="off" placeholder="管理密码">
+      <div class="admin-actions">
+        <button class="btn btn-primary" id="adminLockOk">确定</button>
+        <button class="btn btn-outline" id="adminLockCancel">取消</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ====== Admin ====== -->
   <div class="admin-overlay" id="adminOverlay">
     <div class="admin-panel">
@@ -1018,6 +1038,12 @@
       <label>证书图片（每行一个文件名/URL/base64；建议使用文件名或 URL，超大 base64 可能导致保存失败）</label>
       <textarea id="adminCerts" rows="2"></textarea>
       <input type="file" id="certsUpload" multiple accept="image/*">
+
+      <label style="margin-top:22px">修改管理密码（可选）</label>
+      <input type="password" id="adminOldPin" placeholder="当前密码">
+      <input type="password" id="adminNewPin" placeholder="新密码（至少 4 位）">
+      <input type="password" id="adminNewPin2" placeholder="确认新密码">
+      <button class="btn btn-outline" id="changePinBtn" style="margin-top:8px">更新密码</button>
 
       <div class="admin-actions">
         <button class="btn btn-primary" id="saveAdminBtn">保存并刷新</button>
@@ -1733,6 +1759,82 @@
       bindCopy('copyEmailBtn');
       bindCopy('copyEmailBtn2');
 
+      // ============ Admin lock（仅管理员可编辑） ============
+      const ADMIN_PIN_KEY = 'fkz_resume_admin_pin';
+      const ADMIN_UNLOCK_KEY = 'fkz_resume_admin_unlocked';
+      let adminLockAttempts = 0;
+      let adminLockUntil = 0;
+      function hashPin(pin){
+        let h = 5381;
+        const s = 'fkz::' + String(pin || '');
+        for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+        return h.toString(36);
+      }
+      function getAdminPin(){ try { return localStorage.getItem(ADMIN_PIN_KEY); } catch(e){ return null; } }
+      function setAdminPin(hash){ try { localStorage.setItem(ADMIN_PIN_KEY, hash); } catch(e){} }
+      function isAdminUnlocked(){ try { return sessionStorage.getItem(ADMIN_UNLOCK_KEY) === '1'; } catch(e){ return false; } }
+      function openAdminFlow(){
+        if (isAdminUnlocked()){
+          syncAdmin();
+          document.getElementById('adminOverlay').classList.add('open');
+          return;
+        }
+        const lock = document.getElementById('adminLock');
+        document.getElementById('adminLockInput').value = '';
+        document.getElementById('adminLockMsg').textContent = getAdminPin() ? '请输入管理密码' : '首次使用，请设置管理密码（至少 4 位）';
+        lock.classList.add('open');
+        setTimeout(()=> document.getElementById('adminLockInput').focus(), 50);
+      }
+      function closeAdminLock(){ document.getElementById('adminLock').classList.remove('open'); }
+      function submitAdminPin(){
+        const now = Date.now();
+        if (now < adminLockUntil){
+          document.getElementById('adminLockMsg').textContent = '尝试次数过多，请 ' + Math.ceil((adminLockUntil - now) / 1000) + ' 秒后重试';
+          return;
+        }
+        const input = document.getElementById('adminLockInput').value.trim();
+        const msg = document.getElementById('adminLockMsg');
+        if (!getAdminPin()){
+          if (input.length < 4){ msg.textContent = '密码至少 4 位，请重新输入'; return; }
+          setAdminPin(hashPin(input));
+          adminUnlock();
+          return;
+        }
+        if (hashPin(input) === getAdminPin()){
+          adminUnlock();
+        } else {
+          adminLockAttempts++;
+          if (adminLockAttempts >= 5){
+            adminLockUntil = now + 60000;
+            adminLockAttempts = 0;
+            msg.textContent = '密码错误次数过多，已锁定 60 秒';
+          } else {
+            msg.textContent = '密码错误，还可尝试 ' + (5 - adminLockAttempts) + ' 次';
+          }
+          document.getElementById('adminLockInput').value = '';
+        }
+      }
+      function adminUnlock(){
+        try { sessionStorage.setItem(ADMIN_UNLOCK_KEY, '1'); } catch(e){}
+        closeAdminLock();
+        syncAdmin();
+        document.getElementById('adminOverlay').classList.add('open');
+      }
+      function changeAdminPin(){
+        if (!getAdminPin()){ flashToast('请先设置初始密码（首次打开管理面板时设置）', true); return; }
+        const oldPin = document.getElementById('adminOldPin').value;
+        const p1 = document.getElementById('adminNewPin').value;
+        const p2 = document.getElementById('adminNewPin2').value;
+        if (hashPin(oldPin) !== getAdminPin()){ flashToast('当前密码不正确', true); return; }
+        if (p1.length < 4){ flashToast('新密码至少 4 位', true); return; }
+        if (p1 !== p2){ flashToast('两次输入的新密码不一致', true); return; }
+        setAdminPin(hashPin(p1));
+        document.getElementById('adminOldPin').value = '';
+        document.getElementById('adminNewPin').value = '';
+        document.getElementById('adminNewPin2').value = '';
+        flashToast('✅ 管理密码已更新');
+      }
+
       // ============ Admin ============
       function syncAdmin(){
         const get = id => document.getElementById(id);
@@ -1855,10 +1957,11 @@
       }
       function fileToDataUrl(file){ return new Promise(r=>{ const fr=new FileReader(); fr.onload=e=>r(e.target.result); fr.readAsDataURL(file); }); }
 
-      document.getElementById('openAdminBtn').addEventListener('click', ()=>{
-        syncAdmin();
-        document.getElementById('adminOverlay').classList.add('open');
-      });
+      document.getElementById('openAdminBtn').addEventListener('click', openAdminFlow);
+      document.getElementById('adminLockOk').addEventListener('click', submitAdminPin);
+      document.getElementById('adminLockCancel').addEventListener('click', closeAdminLock);
+      document.getElementById('adminLockInput').addEventListener('keydown', e=>{ if (e.key === 'Enter') submitAdminPin(); });
+      document.getElementById('changePinBtn').addEventListener('click', changeAdminPin);
       document.getElementById('closeAdminBtn').addEventListener('click', ()=> document.getElementById('adminOverlay').classList.remove('open'));
       document.getElementById('saveAdminBtn').addEventListener('click', ()=>{
         try { if (saveFromAdmin()){ flashToast('✅ 已保存并刷新'); document.getElementById('adminOverlay').classList.remove('open'); } }
@@ -1871,7 +1974,7 @@
         e.target.value = '';
       });
       document.getElementById('resetAdminBtn').addEventListener('click', ()=>{
-        if (confirm('确定恢复默认框架吗？将清空当前所有自定义内容。')){
+        if (confirm('确定恢复默认框架吗？将清空当前所有自定义内容与管理密码。')){
           try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
           LEGACY_KEYS.forEach(k=>{ try { localStorage.removeItem(k); } catch(e){} });
           location.reload();
@@ -1889,7 +1992,7 @@
           e.preventDefault();
           const ov = document.getElementById('adminOverlay');
           if (ov.classList.contains('open')){ ov.classList.remove('open'); }
-          else { syncAdmin(); ov.classList.add('open'); }
+          else { openAdminFlow(); }
         }
       });
 
