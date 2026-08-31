@@ -1,0 +1,2239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+  <meta name="description" content="付宽镇 · AI / 智能交通方向实习生极致交互个人简历与精品作品集。">
+  <meta name="author" content="付宽镇">
+  <meta name="theme-color" content="#08090C">
+  <title>付宽镇 · AI / 智能交通 | 极致交互简历与作品集</title>
+  
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      /* Cyber-Swiss Premium Palette */
+      --bg: #08090C;
+      --bg-alt: #0F1117;
+      --surface: rgba(15, 17, 23, 0.76);
+      --surface-hover: rgba(24, 28, 38, 0.92);
+      --border: rgba(255, 255, 255, 0.10);
+      --border-strong: rgba(255, 255, 255, 0.24);
+      
+      --text-main: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --text-dim: #6B7280;
+      
+      --primary: #38BDF8; /* Electric Cyan */
+      --primary-glow: rgba(56, 189, 248, 0.32);
+      --accent: #818CF8;  /* Neural Indigo */
+      --accent-glow: rgba(129, 140, 248, 0.24);
+      
+      --pill-bg: rgba(255, 255, 255, 0.05);
+      --pill-border: rgba(255, 255, 255, 0.14);
+      --pill-hover: rgba(255, 255, 255, 0.12);
+      
+      --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 24px 50px rgba(0, 0, 0, 0.65);
+      
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-mono: "JetBrains Mono", "SF Mono", Consolas, monospace;
+      
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-pill: 999px;
+      
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --nav-h: 76px;
+      --max-w: 1160px;
+    }
+
+    [data-theme="light"] {
+      --bg: #F5F7FA;
+      --bg-alt: #EBF0F5;
+      --surface: rgba(255, 255, 255, 0.85);
+      --surface-hover: rgba(255, 255, 255, 0.98);
+      --border: rgba(0, 0, 0, 0.08);
+      --border-strong: rgba(0, 0, 0, 0.22);
+      
+      --text-main: #0F172A;
+      --text-muted: #475569;
+      --text-dim: #94A3B8;
+      
+      --primary: #0284C7;
+      --primary-glow: rgba(2, 132, 199, 0.20);
+      --accent: #4F46E5;
+      --accent-glow: rgba(79, 70, 229, 0.18);
+      
+      --pill-bg: rgba(0, 0, 0, 0.04);
+      --pill-border: rgba(0, 0, 0, 0.12);
+      --pill-hover: rgba(0, 0, 0, 0.08);
+      
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: var(--font-sans);
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      font-size: 15px;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.4s var(--ease), color 0.4s var(--ease);
+    }
+
+    #interactive-canvas {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+      will-change: transform;
+    }
+
+    .scroll-progress-bar {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      z-index: 1001; width: 0%;
+      box-shadow: 0 0 12px var(--primary);
+      transition: width 0.05s linear;
+    }
+
+    .container {
+      width: 100%;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translate3d(0, 32px, 0) scale(0.97);
+      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+      will-change: opacity, transform;
+    }
+    .reveal.active {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    .reveal-left {
+      opacity: 0;
+      transform: translate3d(-40px, 0, 0);
+      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+    }
+    .reveal-left.active {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+
+    .reveal-right {
+      opacity: 0;
+      transform: translate3d(40px, 0, 0);
+      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+    }
+    .reveal-right.active {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+
+    .side-counter {
+      position: fixed;
+      right: 28px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+      z-index: 900;
+    }
+    @media (min-width: 1280px) { .side-counter { display: flex; } }
+
+    .side-counter-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-dim);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      transition: all 0.3s var(--ease);
+      cursor: pointer;
+    }
+    .side-counter-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--border-strong);
+      transition: all 0.3s var(--ease);
+    }
+    .side-counter-item:hover, .side-counter-item.active {
+      color: var(--primary);
+    }
+    .side-counter-item.active .side-counter-dot {
+      background: var(--primary);
+      box-shadow: 0 0 12px var(--primary);
+      transform: scale(1.6);
+    }
+
+    .index-tag {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .index-tag::before {
+      content: '+';
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      color: var(--text-main);
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .section-sub {
+      color: var(--text-muted);
+      font-size: 1rem;
+      max-width: 680px;
+      line-height: 1.7;
+    }
+
+    .section-header {
+      margin-bottom: 48px;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .bg-watermark {
+      position: absolute;
+      right: 0;
+      top: -30px;
+      font-size: clamp(4rem, 14vw, 10rem);
+      font-weight: 900;
+      color: var(--border);
+      opacity: 0.22;
+      font-family: var(--font-mono);
+      pointer-events: none;
+      user-select: none;
+      z-index: -1;
+      line-height: 1;
+      will-change: transform;
+      transition: transform 0.1s linear;
+    }
+
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      z-index: 1000;
+      background: rgba(8, 9, 12, 0.65);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: height 0.3s var(--ease), background 0.3s var(--ease), box-shadow 0.3s var(--ease), border-color 0.3s var(--ease);
+    }
+    .navbar.scrolled {
+      height: 62px;
+      background: rgba(8, 9, 12, 0.88);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border-bottom-color: var(--border-strong);
+    }
+    [data-theme="light"] .navbar {
+      background: rgba(245, 247, 250, 0.75);
+    }
+    [data-theme="light"] .navbar.scrolled {
+      background: rgba(245, 247, 250, 0.92);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    .navbar .container {
+      display: flex; align-items: center; justify-content: space-between; height: 100%;
+    }
+
+    .brand {
+      display: flex; align-items: center; gap: 12px; text-decoration: none;
+    }
+    .brand-logo {
+      width: 38px; height: 38px;
+      background: var(--text-main);
+      color: var(--bg);
+      font-family: var(--font-mono);
+      font-weight: 900;
+      font-size: 0.9rem;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      letter-spacing: -0.05em;
+      transition: transform 0.3s var(--ease);
+    }
+    .brand:hover .brand-logo {
+      transform: rotate(-8deg) scale(1.05);
+    }
+    .brand-info { display: flex; flex-direction: column; line-height: 1.25; }
+    .brand-name { font-weight: 800; font-size: 1rem; color: var(--text-main); letter-spacing: -0.01em; }
+    .brand-sub { font-size: 0.72rem; color: var(--text-muted); font-family: var(--font-mono); }
+
+    .nav-links {
+      display: none; gap: 6px; list-style: none;
+    }
+    @media (min-width: 900px) { .nav-links { display: flex; } }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.86rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      transition: all 0.25s var(--ease);
+      font-family: var(--font-mono);
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--text-main);
+      background: var(--pill-bg);
+      border: 1px solid var(--pill-border);
+    }
+
+    .nav-actions { display: flex; align-items: center; gap: 8px; }
+
+    .icon-btn {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-main);
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all 0.25s var(--ease);
+      touch-action: manipulation;
+    }
+    .icon-btn:hover {
+      border-color: var(--border-strong);
+      background: var(--surface-hover);
+      transform: translateY(-2px);
+    }
+    .icon-btn:active { transform: scale(0.95); }
+    .icon-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    .mobile-toggle { display: inline-flex; }
+    @media (min-width: 900px) { .mobile-toggle { display: none; } }
+
+    .mobile-menu {
+      position: fixed; top: var(--nav-h); left: 0; right: 0;
+      background: var(--bg-alt);
+      border-bottom: 1px solid var(--border);
+      padding: 24px;
+      transform: translateY(-100%); opacity: 0; pointer-events: none;
+      transition: all 0.35s var(--ease);
+      z-index: 999;
+      box-shadow: var(--shadow-lg);
+    }
+    .mobile-menu.open { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .mobile-menu ul { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .mobile-menu a {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 18px; border-radius: var(--radius-md);
+      color: var(--text-main); text-decoration: none; font-weight: 700;
+      background: var(--surface); border: 1px solid var(--border);
+      font-family: var(--font-mono);
+    }
+
+    .hero {
+      padding-top: calc(var(--nav-h) + 70px);
+      padding-bottom: 90px;
+      min-height: 92vh;
+      display: flex; align-items: center;
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center;
+    }
+    @media (min-width: 900px) {
+      .hero-grid { grid-template-columns: 200px 1fr; gap: 60px; }
+    }
+
+    .avatar-wrapper {
+      position: relative; width: 180px; height: 180px; margin: 0 auto;
+    }
+    .avatar-box {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      padding: 4px;
+      background: linear-gradient(135deg, var(--border-strong), var(--border));
+      position: relative;
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.4s var(--ease);
+      overflow: hidden;
+    }
+    .avatar-wrapper:hover .avatar-box {
+      transform: scale(1.03);
+    }
+    .avatar-img {
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      background: var(--bg-alt);
+      display: block;
+    }
+    .avatar-fallback {
+      width: 100%; height: 100%; border-radius: 50%;
+      background: var(--bg-alt);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 3.5rem; font-weight: 900; color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .status-badge {
+      position: absolute; bottom: 10px; right: 10px;
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #10B981;
+      border: 3px solid var(--bg);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.8);
+      animation: pulse-glow 2s infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 12px rgba(16, 185, 129, 0.6); }
+      50% { box-shadow: 0 0 22px rgba(16, 185, 129, 1); }
+    }
+
+    .hero-content { display: flex; flex-direction: column; align-items: flex-start; }
+
+    .hero-pill {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 6px 16px;
+      border-radius: var(--radius-pill);
+      background: var(--pill-bg);
+      border: 1px solid var(--pill-border);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--primary);
+      margin-bottom: 20px;
+      letter-spacing: 0.05em;
+    }
+    .hero-pill .dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--primary);
+      box-shadow: 0 0 10px var(--primary);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.8); } }
+
+    .hero-name {
+      font-size: clamp(2.8rem, 7vw, 4.8rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      color: var(--text-main);
+      margin-bottom: 12px;
+    }
+
+    .hero-sub {
+      font-size: clamp(1.2rem, 3vw, 1.6rem);
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 16px;
+      font-family: var(--font-mono);
+    }
+
+    .hero-intro {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      line-height: 1.75;
+      margin-bottom: 28px;
+    }
+
+    .badge-group {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 32px;
+    }
+    .badge-item {
+      padding: 6px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 0.82rem; font-weight: 600;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      transition: all 0.25s var(--ease);
+    }
+    .badge-item:hover {
+      border-color: var(--primary);
+      color: var(--text-main);
+      transform: translateY(-2px);
+    }
+
+    .btn-group {
+      display: flex; flex-wrap: wrap; gap: 14px;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 14px 28px;
+      border-radius: var(--radius-pill);
+      font-size: 0.92rem; font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.25s var(--ease);
+      border: 1px solid transparent;
+      white-space: nowrap;
+      position: relative;
+      overflow: hidden;
+      touch-action: manipulation;
+    }
+    .btn-primary {
+      background: var(--text-main);
+      color: var(--bg);
+      border-color: var(--text-main);
+      box-shadow: var(--shadow-sm);
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      opacity: 0.94;
+    }
+    .btn-primary:active { transform: translateY(-1px) scale(0.98); }
+
+    .btn-outline {
+      background: var(--surface);
+      color: var(--text-main);
+      border-color: var(--border-strong);
+    }
+    .btn-outline:hover {
+      background: var(--surface-hover);
+      border-color: var(--text-main);
+      transform: translateY(-3px);
+    }
+    .btn-outline:active { transform: translateY(-1px) scale(0.98); }
+
+    .btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; }
+
+    .card {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      overflow: hidden;
+      transition: border-color 0.35s var(--ease), transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    .card:hover {
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-4px);
+    }
+
+    .spotlight { isolation: isolate; }
+    .spotlight::before {
+      content: '';
+      position: absolute; inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(450px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--primary-glow), transparent 65%);
+      opacity: 0;
+      transition: opacity 0.35s var(--ease);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .spotlight:hover::before { opacity: 1; }
+    .spotlight > * { position: relative; z-index: 2; }
+
+    .about-grid { display: grid; grid-template-columns: 1fr; gap: 28px; margin-bottom: 36px; }
+
+    .info-list {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px; margin-top: 24px; padding-top: 24px;
+      border-top: 1px dashed var(--border);
+    }
+    .info-item .lbl {
+      font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px;
+    }
+    .info-item .val {
+      font-size: 1rem; font-weight: 700; color: var(--text-main);
+    }
+
+    .stat-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 36px;
+    }
+    @media (min-width: 768px) { .stat-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      text-align: left;
+      transition: all 0.3s var(--ease);
+    }
+    .stat-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-4px);
+    }
+    .stat-num {
+      font-family: var(--font-mono);
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-desc { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+
+    .charts-grid {
+      display: grid; grid-template-columns: 1fr; gap: 28px;
+    }
+    @media (min-width: 900px) { .charts-grid { grid-template-columns: 1fr 1fr; } }
+
+    .radar-wrap { display: flex; justify-content: center; padding: 12px 0; }
+
+    .edu-card { position: relative; }
+    .edu-header {
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;
+      margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border);
+    }
+    .edu-school { font-size: 1.4rem; font-weight: 800; }
+    .edu-badge {
+      font-family: var(--font-mono); font-size: 0.82rem; color: var(--primary);
+      background: var(--pill-bg); border: 1px solid var(--pill-border);
+      padding: 6px 16px; border-radius: var(--radius-pill); font-weight: 600;
+    }
+
+    .edu-progress-box { margin-top: 24px; }
+    .edu-progress-label {
+      display: flex; justify-content: space-between; font-size: 0.88rem; color: var(--text-muted); margin-bottom: 10px;
+    }
+    .edu-progress-track {
+      width: 100%; height: 10px; background: var(--bg-alt); border-radius: var(--radius-pill); overflow: hidden;
+    }
+    .edu-progress-bar {
+      height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent));
+      width: 0%; transition: width 1.2s var(--ease);
+    }
+
+    .skill-filter-bar {
+      display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .skill-filter-btn {
+      padding: 8px 18px; border-radius: var(--radius-pill);
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: all 0.25s var(--ease);
+      font-family: var(--font-mono);
+      touch-action: manipulation;
+    }
+    .skill-filter-btn.active {
+      background: var(--primary); color: #FFF; border-color: var(--primary);
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .skills-grid {
+      display: grid; grid-template-columns: 1fr; gap: 24px;
+    }
+    @media (min-width: 640px) { .skills-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .skills-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .skill-card h4 {
+      font-size: 1.05rem; font-weight: 700; margin-bottom: 18px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .skill-card h4::before {
+      content: ''; width: 8px; height: 8px; background: var(--primary); border-radius: 50%;
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 10px; }
+    .skill-pill {
+      font-family: var(--font-mono); font-size: 0.82rem;
+      padding: 6px 14px; border-radius: var(--radius-pill);
+      background: var(--pill-bg); border: 1px solid var(--pill-border);
+      color: var(--text-main);
+      transition: all 0.25s var(--ease);
+    }
+    .skill-pill:hover {
+      border-color: var(--primary); transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    .exp-tabs {
+      display: flex; gap: 12px; margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .exp-tab-btn {
+      padding: 10px 22px; border-radius: var(--radius-pill);
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: 0.9rem; font-weight: 700;
+      cursor: pointer; transition: all 0.25s var(--ease);
+      touch-action: manipulation;
+    }
+    .exp-tab-btn.active {
+      background: var(--text-main); color: var(--bg); border-color: var(--text-main);
+    }
+
+    .exp-panel { display: none; }
+    .exp-panel.active { display: block; animation: fadeIn 0.4s var(--ease); }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .timeline { position: relative; padding-left: 24px; }
+    .timeline::before {
+      content: ''; position: absolute; left: 0; top: 10px; bottom: 10px; width: 2px;
+      background: var(--border);
+    }
+    .timeline-item { position: relative; margin-bottom: 28px; }
+    .timeline-item::before {
+      content: ''; position: absolute; left: -29px; top: 10px; width: 12px; height: 12px;
+      border-radius: 50%; background: var(--bg); border: 2px solid var(--primary);
+    }
+
+    .exp-card h3 { font-size: 1.15rem; font-weight: 800; margin-bottom: 6px; }
+    .exp-meta {
+      font-size: 0.85rem; color: var(--text-dim); margin-bottom: 14px; font-family: var(--font-mono);
+    }
+    .exp-meta span { color: var(--primary); font-weight: 700; margin-right: 10px; }
+    .exp-list { list-style: none; }
+    .exp-list li {
+      position: relative; padding-left: 20px; margin-bottom: 10px;
+      font-size: 0.93rem; color: var(--text-muted); line-height: 1.65;
+    }
+    .exp-list li::before {
+      content: '–'; position: absolute; left: 0; color: var(--primary); font-weight: 800;
+    }
+
+    .projects-grid {
+      display: grid; grid-template-columns: 1fr; gap: 28px;
+    }
+    @media (min-width: 768px) { .projects-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1080px) { .projects-grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      cursor: pointer;
+      transition: all 0.35s var(--ease);
+      position: relative;
+    }
+    .project-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--primary);
+      box-shadow: 0 16px 36px var(--primary-glow);
+    }
+    .project-card:active { transform: translateY(-2px) scale(0.99); }
+
+    .project-cover {
+      position: relative; aspect-ratio: 16/9; background: var(--bg-alt); overflow: hidden;
+    }
+    .project-cover img {
+      width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease);
+    }
+    .project-card:hover .project-cover img { transform: scale(1.08); }
+
+    .project-card-overlay {
+      position: absolute; inset: 0;
+      background: rgba(8, 9, 12, 0.65);
+      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity 0.3s var(--ease);
+      z-index: 5;
+    }
+    .project-card:hover .project-card-overlay { opacity: 1; }
+
+    .project-view-badge {
+      font-family: var(--font-mono); font-size: 0.82rem; font-weight: 700;
+      color: var(--primary); background: var(--surface); border: 1px solid var(--primary);
+      padding: 8px 18px; border-radius: var(--radius-pill);
+      box-shadow: 0 0 16px var(--primary-glow);
+      transform: translateY(10px); transition: transform 0.3s var(--ease-bounce);
+    }
+    .project-card:hover .project-view-badge { transform: translateY(0); }
+
+    .project-cover-placeholder {
+      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+      font-size: 3rem; font-weight: 900; color: var(--text-dim);
+      font-family: var(--font-mono); background: linear-gradient(135deg, var(--bg-alt), var(--surface));
+    }
+
+    .project-type-tag {
+      position: absolute; top: 14px; left: 14px;
+      font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700;
+      padding: 5px 12px; border-radius: var(--radius-pill);
+      background: rgba(8, 9, 12, 0.82); color: #FFF;
+      backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 6;
+    }
+
+    .project-body { padding: 26px; display: flex; flex-direction: column; flex: 1; }
+    .project-title { font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; line-height: 1.3; }
+    .project-role { font-size: 0.82rem; color: var(--primary); font-weight: 700; margin-bottom: 14px; font-family: var(--font-mono); }
+    .project-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.65; margin-bottom: 20px; flex: 1; }
+
+    .project-links {
+      display: flex; gap: 10px; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border);
+    }
+    .project-link {
+      font-size: 0.82rem; font-weight: 700; text-decoration: none;
+      padding: 8px 16px; border-radius: var(--radius-sm);
+      background: var(--pill-bg); border: 1px solid var(--pill-border);
+      color: var(--text-main); transition: all 0.25s var(--ease);
+      touch-action: manipulation;
+    }
+    .project-link:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* Certificates Gallery Style */
+    .certs-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; margin-bottom: 28px;
+    }
+    .cert-thumb {
+      aspect-ratio: 4/3; border-radius: var(--radius-md); overflow: hidden;
+      border: 1px solid var(--border); background: var(--bg-alt); cursor: pointer;
+      position: relative; transition: all 0.35s var(--ease); display: flex;
+      flex-direction: column; align-items: center; justify-content: center;
+    }
+    .cert-thumb img {
+      width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--ease);
+    }
+    .cert-thumb:hover { transform: translateY(-4px) scale(1.02); border-color: var(--primary); box-shadow: 0 12px 28px var(--primary-glow); }
+    .cert-thumb:hover img { transform: scale(1.06); }
+    .cert-caption-overlay {
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 10px;
+      background: linear-gradient(0deg, rgba(8,9,12,0.88), transparent);
+      color: var(--text-main); font-size: 0.8rem; font-family: var(--font-mono); text-align: center;
+    }
+
+    .contact-card { text-align: center; padding: 60px 28px; }
+    .contact-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px; max-width: 840px; margin: 36px auto; text-align: left;
+    }
+    .contact-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 18px; border-radius: var(--radius-md);
+      background: var(--bg-alt); border: 1px solid var(--border);
+      text-decoration: none; color: inherit; transition: all 0.25s var(--ease);
+    }
+    .contact-item:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .contact-item svg { width: 22px; height: 22px; stroke: var(--primary); fill: none; flex-shrink: 0; }
+    .contact-item .lbl { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; font-family: var(--font-mono); }
+    .contact-item .val { font-size: 0.95rem; font-weight: 700; color: var(--text-main); word-break: break-all; }
+
+    footer {
+      padding: 48px 0; border-top: 1px solid var(--border);
+      text-align: center; font-size: 0.85rem; color: var(--text-dim);
+      font-family: var(--font-mono);
+    }
+
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(16px);
+      display: flex; align-items: center; justify-content: center; padding: 24px;
+      opacity: 0; pointer-events: none; transition: opacity 0.35s var(--ease);
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .modal-box {
+      background: var(--bg-alt); border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg); padding: 36px; width: 100%; max-width: 720px;
+      max-height: 88vh; overflow-y: auto; box-shadow: var(--shadow-lg);
+      position: relative; transform: translateY(24px) scale(0.96); transition: transform 0.35s var(--ease-bounce);
+    }
+    .modal-overlay.open .modal-box { transform: translateY(0) scale(1); }
+
+    .modal-close {
+      position: absolute; top: 18px; right: 18px;
+      width: 36px; height: 36px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--surface);
+      color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem; z-index: 10;
+      transition: all 0.2s var(--ease);
+    }
+    .modal-close:hover { border-color: var(--primary); color: var(--primary); transform: rotate(90deg); }
+
+    /* Lightbox & Gallery Controls */
+    .lightbox-nav-btn {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--border-strong);
+      color: var(--text-main); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s var(--ease); z-index: 15;
+    }
+    .lightbox-nav-btn:hover { background: var(--surface-hover); border-color: var(--primary); color: var(--primary); }
+    .lightbox-prev { left: 20px; }
+    .lightbox-next { right: 20px; }
+
+    .lightbox-zoom-toolbar {
+      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 8px; background: var(--surface); border: 1px solid var(--border-strong);
+      padding: 6px 16px; border-radius: var(--radius-pill); z-index: 15;
+    }
+    .lightbox-zoom-btn {
+      background: none; border: none; color: var(--text-main); font-family: var(--font-mono);
+      font-size: 0.9rem; font-weight: 700; cursor: pointer; padding: 4px 8px; border-radius: 4px;
+      transition: color 0.2s;
+    }
+    .lightbox-zoom-btn:hover { color: var(--primary); }
+
+    /* Picture-in-Picture Preview Frame */
+    .pip-preview-container {
+      width: 100%; aspect-ratio: 16/9; margin-bottom: 20px; border-radius: var(--radius-md);
+      overflow: hidden; border: 1px solid var(--border); background: #000; position: relative;
+    }
+    .pip-preview-iframe {
+      width: 100%; height: 100%; border: none;
+    }
+
+    .admin-drawer {
+      position: fixed; inset: 0; z-index: 2500; background: rgba(0,0,0,0.82);
+      display: flex; justify-content: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.35s;
+    }
+    .admin-drawer.open { opacity: 1; pointer-events: auto; }
+    .admin-panel {
+      width: 100%; max-width: 560px; height: 100%; background: var(--bg);
+      border-left: 1px solid var(--border-strong); padding: 36px; overflow-y: auto;
+    }
+    .admin-panel label { display: block; font-size: 0.82rem; font-weight: 700; margin-top: 16px; margin-bottom: 6px; color: var(--text-muted); font-family: var(--font-mono); }
+    .admin-panel input, .admin-panel textarea {
+      width: 100%; padding: 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--bg-alt); color: var(--text-main);
+      font-family: var(--font-mono); font-size: 0.88rem;
+    }
+
+    .toast {
+      position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%) translateY(40px);
+      background: var(--text-main); color: var(--bg); padding: 12px 24px;
+      border-radius: var(--radius-pill); font-size: 0.9rem; font-weight: 700;
+      box-shadow: var(--shadow-lg); opacity: 0; transition: all 0.35s var(--ease);
+      z-index: 3000; pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    @media print {
+      #interactive-canvas, .navbar, .side-counter, .btn-group, .scroll-progress-bar, .nav-actions, .mobile-toggle, footer, .modal-overlay, .admin-drawer { display: none !important; }
+      body { background: #FFF !important; color: #000 !important; font-size: 10pt; }
+      .container { max-width: 100% !important; padding: 0 !important; }
+      .card, .stat-card, .project-card { border: 1px solid #DDD !important; box-shadow: none !important; background: #FFF !important; break-inside: avoid; }
+      .section-title { font-size: 18pt !important; color: #000 !important; }
+      .hero { padding-top: 0 !important; min-height: auto !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="interactive-canvas"></canvas>
+  <div class="scroll-progress-bar" id="scrollProgress"></div>
+
+  <!-- Side Section Tracker -->
+  <div class="side-counter" id="sideCounter">
+    <a href="#home" class="side-counter-item active" data-section="home"><span class="side-counter-dot"></span> 00 // HERO</a>
+    <a href="#about" class="side-counter-item" data-section="about"><span class="side-counter-dot"></span> 01 // PROFILE</a>
+    <a href="#education" class="side-counter-item" data-section="education"><span class="side-counter-dot"></span> 02 // EDUCATION</a>
+    <a href="#skills" class="side-counter-item" data-section="skills"><span class="side-counter-dot"></span> 03 // SKILLS</a>
+    <a href="#experience" class="side-counter-item" data-section="experience"><span class="side-counter-dot"></span> 04 // EXPERIENCE</a>
+    <a href="#projects" class="side-counter-item" data-section="projects"><span class="side-counter-dot"></span> 05 // WORKS</a>
+    <a href="#certificates" class="side-counter-item" data-section="certificates"><span class="side-counter-dot"></span> 06 // HONORS</a>
+    <a href="#contact" class="side-counter-item" data-section="contact"><span class="side-counter-dot"></span> 07 // CONNECT</a>
+  </div>
+
+  <nav class="navbar" id="navbar">
+    <div class="container">
+      <a href="#home" class="brand">
+        <div class="brand-logo">FKZ</div>
+        <div class="brand-info">
+          <span class="brand-name">付宽镇</span>
+          <span class="brand-sub">AI / 智能交通</span>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#about">01 // 关于</a></li>
+        <li><a href="#education">02 // 教育</a></li>
+        <li><a href="#skills">03 // 技能</a></li>
+        <li><a href="#experience">04 // 经历</a></li>
+        <li><a href="#projects">05 // 作品</a></li>
+        <li><a href="#certificates">06 // 证书</a></li>
+        <li><a href="#contact">07 // 联系</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button class="icon-btn" id="themeToggle" title="切换黑/白主题" aria-label="切换黑/白主题">
+          <svg viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        </button>
+        <button class="icon-btn" onclick="window.print()" title="导出 / 打印 PDF" aria-label="导出 PDF">
+          <svg viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
+        </button>
+        <button class="icon-btn" id="openAdminBtn" title="管理内容 (Ctrl+M)" aria-label="管理内容">
+          <svg viewBox="0 0 24 24"><path d="M12 6V4m0 16v-2m6-8h2M4 12H2m15.364-6.364l1.414-1.414M6.343 17.657l-1.414 1.414m12.728 0l1.414 1.414M6.343 6.343L4.929 4.929M12 15a3 3 0 100-6 3 3 0 000 6z"/></svg>
+        </button>
+        <button class="icon-btn mobile-toggle" id="mobileToggle" aria-label="切换移动端菜单">
+          <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <ul>
+      <li><a href="#about" onclick="closeMobile()">01 // 关于我</a></li>
+      <li><a href="#education" onclick="closeMobile()">02 // 教育背景</a></li>
+      <li><a href="#skills" onclick="closeMobile()">03 // 专业技能</a></li>
+      <li><a href="#experience" onclick="closeMobile()">04 // 实践经历</a></li>
+      <li><a href="#projects" onclick="closeMobile()">05 // 项目作品</a></li>
+      <li><a href="#certificates" onclick="closeMobile()">06 // 荣誉证书</a></li>
+      <li><a href="#contact" onclick="closeMobile()">07 // 联系方式</a></li>
+    </ul>
+  </div>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="avatar-wrapper reveal">
+            <div class="avatar-box">
+              <div id="avatarInner" style="width:100%;height:100%;"></div>
+            </div>
+            <div class="status-badge" title="系统联机 · 可随时到岗实习"></div>
+          </div>
+
+          <div class="hero-content reveal">
+            <div class="hero-pill">
+              <span class="dot"></span> NEURAL LINK // SYSTEM READY
+            </div>
+            <h1 class="hero-name" id="heroName">付宽镇</h1>
+            <div class="hero-sub" id="heroTitle">AI / 智能交通方向实习生</div>
+            <p class="hero-intro" id="heroIntro"></p>
+
+            <div class="badge-group" id="heroBadges"></div>
+
+            <div class="btn-group">
+              <button class="btn btn-primary" id="copyEmailBtn">
+                <svg viewBox="0 0 24 24"><path d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                复制电子邮箱
+              </button>
+              <a class="btn btn-outline" id="githubBtn" href="#" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+                GitHub 个人主页
+              </a>
+              <button class="btn btn-outline" onclick="window.print()">
+                <svg viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                导出 PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" style="padding: 80px 0; position:relative;">
+      <div class="bg-watermark" data-parallax="-0.15">01</div>
+      <div class="container">
+        <div class="section-header reveal">
+          <div>
+            <div class="index-tag">01 // PROFILE</div>
+            <h2 class="section-title">个人简介与核心数据</h2>
+            <p class="section-sub">建筑工程技术专业 2026 级 · 聚焦 AI 赋能与智能交通交叉实践领域。</p>
+          </div>
+        </div>
+
+        <div class="about-grid reveal">
+          <div class="card spotlight">
+            <p id="aboutIntroText" style="line-height: 1.85; color: var(--text-muted); font-size: 1.05rem;"></p>
+            <div class="info-list" id="infoList"></div>
+          </div>
+        </div>
+
+        <!-- Animated Numerics -->
+        <div class="stat-grid" id="statGrid"></div>
+
+        <div class="charts-grid">
+          <div class="card spotlight reveal-left">
+            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 20px;">能力维度雷达 (0-100)</h3>
+            <div class="radar-wrap" id="radarWrap"></div>
+          </div>
+          <div class="card spotlight reveal-right">
+            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 20px;">特长软实力与偏好</h3>
+            <div style="margin-bottom: 20px;">
+              <div style="font-size:0.82rem; color:var(--text-dim); margin-bottom:10px; font-family:var(--font-mono);">岗位相关特长</div>
+              <div class="tag-cloud" id="strengthsTags"></div>
+            </div>
+            <div>
+              <div style="font-size:0.82rem; color:var(--text-dim); margin-bottom:10px; font-family:var(--font-mono);">兴趣爱好</div>
+              <div class="tag-cloud" id="hobbiesTags"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="education" style="padding: 80px 0; position:relative;">
+      <div class="bg-watermark" data-parallax="-0.15">02</div>
+      <div class="container">
+        <div class="section-header reveal">
+          <div>
+            <div class="index-tag">02 // EDUCATION</div>
+            <h2 class="section-title">教育背景</h2>
+          </div>
+        </div>
+
+        <div class="card edu-card spotlight reveal">
+          <div class="edu-header">
+            <div>
+              <div class="edu-school" id="eduSchool"></div>
+              <div style="color: var(--text-muted); font-size: 1rem; margin-top: 6px;" id="eduMajor"></div>
+            </div>
+            <div class="edu-badge" id="eduDegree"></div>
+          </div>
+
+          <div class="info-list" style="margin-top:0; border:none; padding-top:0;">
+            <div class="info-item"><div class="lbl">就读学制</div><div class="val" id="eduPeriod"></div></div>
+          </div>
+
+          <div class="edu-progress-box">
+            <div class="edu-progress-label">
+              <span>就读进度评估</span>
+              <span id="eduProgressVal" style="font-family: var(--font-mono); font-weight:800; color:var(--primary);">–</span>
+            </div>
+            <div class="edu-progress-track">
+              <div class="edu-progress-bar" id="eduProgressBar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" style="padding: 80px 0; position:relative;">
+      <div class="bg-watermark" data-parallax="-0.15">03</div>
+      <div class="container">
+        <div class="section-header reveal">
+          <div>
+            <div class="index-tag">03 // CAPABILITIES</div>
+            <h2 class="section-title">专业技能栈</h2>
+            <p class="section-sub">支持分类筛选与实时展示</p>
+          </div>
+        </div>
+
+        <div class="skill-filter-bar reveal" id="skillFilterBar">
+          <button class="skill-filter-btn active" onclick="filterSkills('ALL', this)">全部技能</button>
+          <button class="skill-filter-btn" onclick="filterSkills('精通', this)">精通</button>
+          <button class="skill-filter-btn" onclick="filterSkills('熟悉', this)">熟悉</button>
+          <button class="skill-filter-btn" onclick="filterSkills('了解', this)">了解</button>
+        </div>
+
+        <div class="skills-grid" id="skillsContainer"></div>
+      </div>
+    </section>
+
+    <section id="experience" style="padding: 80px 0; position:relative;">
+      <div class="bg-watermark" data-parallax="-0.15">04</div>
+      <div class="container">
+        <div class="section-header reveal">
+          <div>
+            <div class="index-tag">04 // EXPERIENCE</div>
+            <h2 class="section-title">实践与校园经历</h2>
+          </div>
+        </div>
+
+        <div class="exp-tabs reveal" id="expTabs"></div>
+        <div id="expPanels"></div>
+      </div>
+    </section>
+
+    <section id="projects" style="padding: 80px 0; position:relative;">
+      <div class="bg-watermark" data-parallax="-0.15">05</div>
+      <div class="container">
+        <div class="section-header reveal">
+          <div>
+            <div class="index-tag">05 // SELECTED WORKS</div>
+            <h2 class="section-title">核心项目作品集</h2>
+          </div>
+        </div>
+
+        <div class="projects-grid" id="projectsGrid"></div>
+      </div>
+    </section>
+
+    <section id="certificates" style="padding: 80px 0; position:relative;">
+      <div class="bg-watermark" data-parallax="-0.15">06</div>
+      <div class="container">
+        <div class="section-header reveal">
+          <div>
+            <div class="index-tag">06 // HONORS & CERTS</div>
+            <h2 class="section-title">荣誉证书</h2>
+          </div>
+        </div>
+
+        <div class="certs-grid" id="certsGrid"></div>
+      </div>
+    </section>
+
+    <section id="contact" style="padding: 80px 0 120px; position:relative;">
+      <div class="bg-watermark" data-parallax="-0.15">07</div>
+      <div class="container">
+        <div class="card contact-card spotlight reveal">
+          <div class="index-tag" style="justify-content:center;">07 // CONNECT</div>
+          <h2 class="section-title">期待与您沟通</h2>
+          <p class="section-sub" style="margin: 0 auto;">随时欢迎实习岗位讨论与行业交流。</p>
+
+          <div class="contact-grid" id="contactGrid"></div>
+
+          <div class="btn-group" style="justify-content:center; margin-top:24px;">
+            <button class="btn btn-primary" id="copyEmailBtn2">复制电子邮箱</button>
+            <button class="btn btn-outline" onclick="window.print()">下载 PDF 简历</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div>© 2026 付宽镇 · AI / 智能交通简历与作品集</div>
+      <div style="margin-top: 8px; opacity: 0.75;">最后更新于 <span id="updateTime"></span> · 支持原生 PDF 导出</div>
+    </div>
+  </footer>
+
+  <!-- Lightbox Modal for Certificate Preview & Zoom -->
+  <div class="modal-overlay" id="lightbox">
+    <button class="modal-close" onclick="closeModal('lightbox')" aria-label="关闭">×</button>
+    <button class="lightbox-nav-btn lightbox-prev" onclick="prevLightboxImage()" aria-label="上一张">‹</button>
+    <button class="lightbox-nav-btn lightbox-next" onclick="nextLightboxImage()" aria-label="下一张">›</button>
+
+    <div style="overflow:hidden; display:flex; align-items:center; justify-content:center; width:100%; height:100%;">
+      <img id="lightboxImg" src="" style="max-width:85vw; max-height:80vh; border-radius: var(--radius-md); object-fit:contain; transition: transform 0.25s var(--ease);" alt="图片放大预览">
+    </div>
+
+    <div class="lightbox-zoom-toolbar">
+      <button class="lightbox-zoom-btn" onclick="zoomLightbox(0.2)">+ 放大</button>
+      <button class="lightbox-zoom-btn" onclick="zoomLightbox(-0.2)">- 缩小</button>
+      <button class="lightbox-zoom-btn" onclick="resetLightboxZoom()">100%</button>
+    </div>
+  </div>
+
+  <!-- Project Detail Modal with PiP / Live Preview -->
+  <div class="modal-overlay" id="projModal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('projModal')" aria-label="关闭">×</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div id="projModalType" class="project-type-tag" style="position:static; display:inline-block;"></div>
+        <div style="display:flex; gap:8px;">
+          <button class="icon-btn" style="width:32px; height:32px;" onclick="prevProjectDetail()" title="上一个项目">‹</button>
+          <button class="icon-btn" style="width:32px; height:32px;" onclick="nextProjectDetail()" title="下一个项目">›</button>
+        </div>
+      </div>
+      <h3 id="projModalTitle" style="font-size:1.5rem; margin-bottom:10px;"></h3>
+      <p id="projModalIntro" style="color:var(--text-muted); font-size:0.95rem; line-height:1.7; margin-bottom:20px;"></p>
+
+      <!-- Interactive Picture-in-Picture Preview Frame -->
+      <div class="pip-preview-container" id="pipContainer" style="display:none;">
+        <iframe class="pip-preview-iframe" id="pipIframe" title="在线画中画预览"></iframe>
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <div style="font-size:0.78rem; color:var(--text-dim); font-family:var(--font-mono); margin-bottom:8px;">技术栈</div>
+        <div class="tag-cloud" id="projModalTech"></div>
+      </div>
+
+      <div style="margin-bottom:24px;">
+        <div style="font-size:0.78rem; color:var(--text-dim); font-family:var(--font-mono); margin-bottom:8px;">贡献细节</div>
+        <ul class="exp-list" id="projModalContrib"></ul>
+      </div>
+
+      <div class="btn-group">
+        <a class="btn btn-primary" id="projModalDemo" href="#" target="_blank" rel="noopener">在线全屏体验 ↗</a>
+        <a class="btn btn-outline" id="projModalSource" href="#" target="_blank" rel="noopener">源码仓库</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Drawer -->
+  <div class="admin-drawer" id="adminDrawer">
+    <div class="admin-panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h3 style="font-size:1.3rem; font-weight:800;">⚙️ 内容管理面板</h3>
+        <button class="icon-btn" onclick="closeAdmin()">×</button>
+      </div>
+
+      <label>姓名 / 求职意向</label>
+      <input type="text" id="adminName">
+      <input type="text" id="adminTitle">
+
+      <label>个人头像 (点击右侧选择本地照片)</label>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="adminAvatar" placeholder="图片 URL 或 Base64 Data">
+        <button type="button" class="btn btn-outline" style="padding:8px 16px; flex-shrink:0; font-size:0.82rem;" onclick="document.getElementById('adminAvatarFile').click()">选择本地文件</button>
+      </div>
+      <input type="file" id="adminAvatarFile" accept="image/*" style="display:none">
+
+      <label>邮箱 / 电话 / 城市 / GitHub</label>
+      <input type="text" id="adminEmail">
+      <input type="text" id="adminPhone">
+      <input type="text" id="adminCity">
+      <input type="text" id="adminGithub">
+
+      <label>个人简介</label>
+      <textarea id="adminIntro" rows="3"></textarea>
+
+      <label>徽章列表 (逗号分隔)</label>
+      <input type="text" id="adminBadges">
+
+      <label>学校 / 专业 / 学制</label>
+      <input type="text" id="adminSchool">
+      <input type="text" id="adminMajor">
+      <input type="text" id="adminPeriod">
+
+      <label>技能列表 (格式：分类:技能1,技能2)</label>
+      <textarea id="adminSkills" rows="4"></textarea>
+
+      <label>特长 (每行一个)</label>
+      <textarea id="adminStrengths" rows="3"></textarea>
+
+      <label>兴趣 (每行一个)</label>
+      <textarea id="adminHobbies" rows="3"></textarea>
+
+      <label>荣誉证书管理 (点击下方按钮选择图片批量添加)</label>
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <button type="button" class="btn btn-outline" style="padding:8px 16px; font-size:0.82rem;" onclick="document.getElementById('adminCertBatchFile').click()">批量上传本地证书图片</button>
+      </div>
+      <input type="file" id="adminCertBatchFile" accept="image/*" multiple style="display:none">
+      <div id="adminCertListContainer" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(90px, 1fr)); gap:8px; margin-top:8px;"></div>
+
+      <div style="margin-top:28px; display:flex; gap:12px; flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="saveAdmin()">保存生效</button>
+        <button class="btn btn-outline" onclick="exportBackup()">导出 JSON 备份</button>
+        <button class="btn btn-outline" onclick="resetDefault()" style="color:#EF4444;">恢复默认</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin PIN Modal -->
+  <div class="modal-overlay" id="pinModal">
+    <div class="modal-box" style="max-width:380px; text-align:center;">
+      <h3 style="margin-bottom:12px; font-size:1.3rem;">管理员验证</h3>
+      <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:20px;">请输入 4 位及以上管理密码</p>
+      <input type="password" id="pinInput" placeholder="输入密码" style="text-align:center; padding:12px; border-radius:var(--radius-sm); border:1px solid var(--border); width:100%; margin-bottom:20px; font-size:1.1rem;">
+      <div class="btn-group" style="justify-content:center;">
+        <button class="btn btn-primary" onclick="submitPin()">验证</button>
+        <button class="btn btn-outline" onclick="closeModal('pinModal')">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- JS ENGINE & INTERACTION SCRIPT -->
+  <script>
+    (function(){
+      'use strict';
+      const STORAGE_KEY = 'fkz_resume_v2026';
+      
+      const DEFAULT_DATA = {
+        profile: {
+          name: '付宽镇',
+          title: 'AI / 智能交通方向实习生',
+          school: '湖南高速铁路职业技术学院',
+          major: '建筑工程技术 (2026级)',
+          degree: '专科在读',
+          period: '2026.09 – 2029.06 (预计)',
+          city: '湖南 · 衡阳',
+          email: '17388917491@163.com',
+          phone: '17388917491',
+          github: 'https://github.com/wen-6-dao',
+          avatar: 'bb59d62d-f726-4396-9a1f-6d9842931c75.jpg',
+          intro: '湖南高速铁路职业技术学院建筑工程技术专业 2026 级在读。具备良好的 Python 编程能力、数据处理与网页应用开发经验；兼具广九客运段乘务实习与班级团支书组织协调经验。'
+        },
+        badges: ['2026 级新生', 'AI / 智能交通', '湖南 · 衡阳', '随时可到岗'],
+        highlights: [
+          { value: 100, suffix: '%', desc: '班级青年大学习参与率' },
+          { value: 83, suffix: ' 条', desc: '学院官网公开结构化数据抓取' },
+          { value: 10, suffix: ' 页', desc: 'AI 与 Agent 编程全景报告' },
+          { value: 30, suffix: '+ 项', desc: '调研引用数据项' }
+        ],
+        radar: {
+          labels: ['编程能力', '问题解决', '沟通协作', '组织协调', '自主学习', '数据素养'],
+          values: [75, 78, 85, 82, 90, 80]
+        },
+        skills: {
+          '精通': ['Python', 'HTML5', 'CSS3', 'JavaScript', '数据可视化'],
+          '熟悉': ['SQL', 'NumPy / Pandas', 'Requests / BeautifulSoup', 'Git / Linux', '信息设计'],
+          '了解': ['PyTorch', 'YOLO / OpenCV', 'LangChain / RAG', 'TensorRT', 'C / Shell', '树莓派 IoT']
+        },
+        experiences: {
+          tabs: ['实习实践', '校园经历'],
+          data: {
+            '实习实践': [
+              {
+                title: '实习乘务员',
+                org: '广九客运段',
+                duration: '2025.08 – 2025.11 (3个月)',
+                details: [
+                  '负责车厢旅客服务、验票引导、安全提示及重点旅客帮扶，日均服务旅客百余人次。',
+                  '参与处理旅客身体不适、行李遗失、列车晚点等突发情况，协助车长现场安抚与信息上报。'
+                ]
+              },
+              {
+                title: 'AI 编程自学实践项目',
+                org: '个人自主项目',
+                duration: '2026.07 – 2026.08',
+                details: [
+                  '自主学习 Python 及 H5 编程，开发像素风格对战游戏，实现完整碰撞检测与关卡逻辑。',
+                  '编写网络爬虫并对多源数据进行清洗、整合与图形化可视化展示。'
+                ]
+              }
+            ],
+            '校园经历': [
+              {
+                title: '班级团支书',
+                org: '班级团支部',
+                duration: '2026 级至今',
+                details: [
+                  '负责支部思想建设与日常团务管理，创下青年大学习多期参与率 100% 记录。',
+                  '策划并组织主题团日活动与志愿服务，培养了出色的组织协调与团队协作能力。'
+                ]
+              }
+            ]
+          }
+        },
+        projects: [
+          {
+            title: 'AI 与 Agent 编程：数据全景 2026',
+            type: 'PPT 演示 & 网页',
+            role: '信息设计与前端交互',
+            intro: '面向 AI 与 Agent 编程的 10 页高视觉冲击力数据报告，涵盖市场规模、工具格局、效率证据五维结构。',
+            tech: ['信息设计', '数据可视化', 'HTML/CSS'],
+            contributions: ['独立完成 10 页排版及网页端响应式翻页演示', '结构化呈现 30+ 项数据指标'],
+            demo: 'https://wen-6-dao.github.io/resume-ppt/ppt.html',
+            source: 'https://github.com/wen-6-dao/resume-ppt'
+          },
+          {
+            title: '像素坦克：废土突围',
+            type: 'H5 独立游戏',
+            role: '独立全栈开发',
+            intro: '像素风格坦克对战 H5 互动游戏，采用原生 JavaScript 开发，支持键盘与触屏双模操作。',
+            tech: ['HTML5 Canvas', 'JavaScript', 'CSS3'],
+            contributions: ['原生实现移动、射击、碰撞检测与计分关卡', '部署上线并完美适配移动端'],
+            demo: 'https://wen-6-dao.github.io/pixel-tank-wasteland/',
+            source: 'https://github.com/wen-6-dao/pixel-tank-wasteland'
+          },
+          {
+            title: '铁道运输学院信息门户网站',
+            type: '网页设计 & 数据可视化',
+            role: '独立全栈开发',
+            intro: '面向学院的展示型信息门户，卡片式布局与铁路动车主题动画，集成 83 条爬虫抓取数据。',
+            tech: ['HTML/CSS/JS', 'Python', 'BeautifulSoup'],
+            contributions: ['独立编写 Python 爬虫抓取 83 条公开数据', '设计复兴号 SVG 滚动动画与交互弹窗'],
+            demo: 'https://wen-6-dao.github.io/hntky-crawler/',
+            source: 'https://github.com/wen-6-dao/hntky-crawler'
+          }
+        ],
+        interests: {
+          strengths: ['团队协作与沟通', '自主学习能力', '组织协调', '服务与应变', '信息整理与可视化'],
+          hobbies: ['AI智能体编程', '健体功能性训练', '开源技术探索']
+        },
+        certificates: ['certs/cert-1.jpg', 'certs/cert-2.jpg']
+      };
+
+      let appData = clone(DEFAULT_DATA);
+      try {
+        const local = localStorage.getItem(STORAGE_KEY);
+        if (local) {
+          const parsed = JSON.parse(local);
+          if (parsed.profile && !parsed.profile.avatar) {
+            parsed.profile.avatar = DEFAULT_DATA.profile.avatar;
+          }
+          appData = Object.assign({}, DEFAULT_DATA, parsed);
+        }
+      } catch(e){}
+
+      function saveData() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+          return true;
+        } catch(e) {
+          showToast('保存失败，存储容量可能已满');
+          return false;
+        }
+      }
+
+      function clone(o) { return JSON.parse(JSON.stringify(o)); }
+      function esc(s) { return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
+
+      let revealObserver = null;
+
+      function initScrollReveals() {
+        if (revealObserver) {
+          revealObserver.disconnect();
+        }
+
+        revealObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('active');
+              if (entry.target.classList.contains('stat-card') || entry.target.id === 'about') {
+                animateStats();
+              }
+            }
+          });
+        }, {
+          threshold: 0.12,
+          rootMargin: '0px 0px -30px 0px'
+        });
+
+        const elements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+        elements.forEach(el => revealObserver.observe(el));
+      }
+
+      function renderAll() {
+        renderProfile();
+        renderStats();
+        renderRadar();
+        renderEducation();
+        renderSkills('ALL');
+        renderExperiences();
+        renderProjects();
+        renderCertificates();
+        renderContact();
+        document.getElementById('updateTime').textContent = new Date().toLocaleDateString('zh-CN');
+        initScrollReveals();
+      }
+
+      function renderProfile() {
+        const p = appData.profile;
+        document.getElementById('heroName').textContent = p.name;
+        document.getElementById('heroTitle').textContent = p.title;
+        document.getElementById('heroIntro').textContent = p.intro;
+        document.getElementById('aboutIntroText').textContent = p.intro;
+
+        document.getElementById('heroBadges').innerHTML = (appData.badges||[]).map(b=>`<span class="badge-item">${esc(b)}</span>`).join('');
+
+        const avatarBox = document.getElementById('avatarInner');
+        if (p.avatar) {
+          avatarBox.innerHTML = `<img src="${esc(p.avatar)}" class="avatar-img" alt="头像" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';"><div class="avatar-fallback" style="display:none;">${esc(p.name.charAt(0))}</div>`;
+        } else {
+          avatarBox.innerHTML = `<div class="avatar-fallback">${esc(p.name.charAt(0))}</div>`;
+        }
+
+        document.getElementById('infoList').innerHTML = `
+          <div class="info-item"><div class="lbl">所在地</div><div class="val">${esc(p.city)}</div></div>
+          <div class="info-item"><div class="lbl">电子邮箱</div><div class="val">${esc(p.email)}</div></div>
+          <div class="info-item"><div class="lbl">联系电话</div><div class="val">${esc(p.phone)}</div></div>
+          <div class="info-item"><div class="lbl">GitHub</div><div class="val">${esc(p.github)}</div></div>
+        `;
+
+        document.getElementById('githubBtn').href = p.github || '#';
+        
+        document.getElementById('strengthsTags').innerHTML = (appData.interests.strengths||[]).map(s=>`<span class="skill-pill">${esc(s)}</span>`).join('');
+        document.getElementById('hobbiesTags').innerHTML = (appData.interests.hobbies||[]).map(h=>`<span class="skill-pill">${esc(h)}</span>`).join('');
+      }
+
+      let statsAnimated = false;
+      function renderStats() {
+        const grid = document.getElementById('statGrid');
+        grid.innerHTML = (appData.highlights||[]).map((h, i)=>`
+          <div class="stat-card spotlight reveal">
+            <div class="stat-num" id="stat-num-${i}">0</div>
+            <div class="stat-desc">${esc(h.desc)}</div>
+          </div>
+        `).join('');
+        initScrollReveals();
+      }
+
+      function animateStats() {
+        if (statsAnimated) return;
+        statsAnimated = true;
+        (appData.highlights||[]).forEach((h, i)=>{
+          const el = document.getElementById(`stat-num-${i}`);
+          if (!el) return;
+          const target = h.value;
+          const suffix = h.suffix || '';
+          let current = 0;
+          const duration = 1200;
+          const stepTime = 20;
+          const steps = duration / stepTime;
+          const increment = target / steps;
+          
+          const timer = setInterval(()=>{
+            current += increment;
+            if (current >= target) {
+              current = target;
+              clearInterval(timer);
+            }
+            el.textContent = Math.floor(current) + suffix;
+          }, stepTime);
+        });
+      }
+
+      function renderRadar() {
+        const wrap = document.getElementById('radarWrap');
+        const r = appData.radar || { labels: [], values: [] };
+        const n = r.labels.length;
+        if (n < 3) return;
+
+        const cx = 150, cy = 130, R = 90;
+        const pts = [];
+        for (let i = 0; i < n; i++) {
+          const a = (Math.PI * 2 / n) * i - Math.PI / 2;
+          const val = (r.values[i] || 50) / 100;
+          pts.push(`${(cx + Math.cos(a) * R * val).toFixed(1)},${(cy + Math.sin(a) * R * val).toFixed(1)}`);
+        }
+
+        wrap.innerHTML = `
+          <svg width="300" height="260" viewBox="0 0 300 260">
+            ${[0.3, 0.6, 1].map(scale => {
+              const ringPts = [];
+              for(let i=0; i<n; i++) {
+                const a = (Math.PI * 2 / n) * i - Math.PI / 2;
+                ringPts.push(`${(cx + Math.cos(a) * R * scale).toFixed(1)},${(cy + Math.sin(a) * R * scale).toFixed(1)}`);
+              }
+              return `<polygon points="${ringPts.join(' ')}" fill="none" stroke="var(--border)" stroke-width="1"/>`;
+            }).join('')}
+            <polygon points="${pts.join(' ')}" fill="var(--primary-glow)" stroke="var(--primary)" stroke-width="2"/>
+            ${r.labels.map((lbl, i)=>{
+              const a = (Math.PI * 2 / n) * i - Math.PI / 2;
+              const tx = cx + Math.cos(a) * (R + 20);
+              const ty = cy + Math.sin(a) * (R + 14);
+              return `<text x="${tx}" y="${ty}" text-anchor="middle" fill="var(--text-muted)" font-size="11" font-family="var(--font-mono)">${esc(lbl)}</text>`;
+            }).join('')}
+          </svg>
+        `;
+      }
+
+      function renderEducation() {
+        const p = appData.profile;
+        document.getElementById('eduSchool').textContent = p.school;
+        document.getElementById('eduMajor').textContent = p.major;
+        document.getElementById('eduDegree').textContent = p.degree;
+        document.getElementById('eduPeriod').textContent = p.period;
+        const now = new Date();
+        const start = new Date(2026, 8, 1);
+        const end = new Date(2029, 5, 30);
+        let ratio = 0;
+        if (now > start) {
+          ratio = Math.min(100, Math.max(0, ((now - start) / (end - start)) * 100));
+        }
+        document.getElementById('eduProgressBar').style.width = ratio.toFixed(1) + '%';
+        document.getElementById('eduProgressVal').textContent = ratio > 0 ? ratio.toFixed(1) + '%' : '即将入学';
+      }
+
+      window.filterSkills = function(cat, btn) {
+        document.querySelectorAll('.skill-filter-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        renderSkills(cat);
+      };
+
+      function renderSkills(filterCategory = 'ALL') {
+        const skillsObj = appData.skills || {};
+        const container = document.getElementById('skillsContainer');
+        let html = '';
+
+        Object.entries(skillsObj).forEach(([cat, list]) => {
+          if (filterCategory === 'ALL' || filterCategory === cat) {
+            html += `
+              <div class="card skill-card spotlight reveal">
+                <h4>${esc(cat)}</h4>
+                <div class="tag-cloud">
+                  ${list.map(s => `<span class="skill-pill">${esc(s)}</span>`).join('')}
+                </div>
+              </div>
+            `;
+          }
+        });
+        container.innerHTML = html;
+        initScrollReveals();
+      }
+
+      function renderExperiences() {
+        const tabsEl = document.getElementById('expTabs');
+        const panelsEl = document.getElementById('expPanels');
+        const exp = appData.experiences;
+
+        tabsEl.innerHTML = exp.tabs.map((t, i)=>`
+          <button class="exp-tab-btn ${i===0?'active':''}" onclick="switchExpTab('${esc(t)}', this)">${esc(t)}</button>
+        `).join('');
+
+        panelsEl.innerHTML = exp.tabs.map((t, i)=>`
+          <div class="exp-panel ${i===0?'active':''}" id="exp-panel-${i}">
+            <div class="timeline">
+              ${(exp.data[t]||[]).map(item=>`
+                <div class="timeline-item reveal">
+                  <div class="card exp-card spotlight">
+                    <h3>${esc(item.title)}</h3>
+                    <div class="exp-meta"><span>${esc(item.org)}</span> ${esc(item.duration)}</div>
+                    <ul class="exp-list">
+                      ${(item.details||[]).map(d=>`<li>${esc(d)}</li>`).join('')}
+                    </ul>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `).join('');
+        initScrollReveals();
+      }
+
+      window.switchExpTab = function(tabName, btn) {
+        document.querySelectorAll('.exp-tab-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const idx = appData.experiences.tabs.indexOf(tabName);
+        document.querySelectorAll('.exp-panel').forEach((p, i)=>{
+          p.classList.toggle('active', i === idx);
+        });
+      };
+
+      function renderProjects() {
+        document.getElementById('projectsGrid').innerHTML = (appData.projects||[]).map((p, i)=>`
+          <div class="project-card spotlight reveal" onclick="openProjModal(${i})">
+            <div class="project-cover">
+              <div class="project-cover-placeholder">${esc(p.title.charAt(0))}</div>
+              <span class="project-type-tag">${esc(p.type)}</span>
+              <div class="project-card-overlay">
+                <span class="project-view-badge">点击查看详情 ↗</span>
+              </div>
+            </div>
+            <div class="project-body">
+              <div class="project-title">${esc(p.title)}</div>
+              <div class="project-role">${esc(p.role)}</div>
+              <div class="project-desc">${esc(p.intro)}</div>
+              <div class="project-links">
+                ${(p.demo && p.demo !== '#') ? `<a href="${esc(p.demo)}" target="_blank" rel="noopener" class="project-link" onclick="event.stopPropagation()">全屏体验 ↗</a>` : ''}
+                ${(p.source && p.source !== '#') ? `<a href="${esc(p.source)}" target="_blank" rel="noopener" class="project-link" onclick="event.stopPropagation()">GitHub 源码</a>` : ''}
+              </div>
+            </div>
+          </div>
+        `).join('');
+        initScrollReveals();
+      }
+
+      let currentProjectIdx = 0;
+      window.openProjModal = function(idx) {
+        currentProjectIdx = idx;
+        const p = appData.projects[idx];
+        if (!p) return;
+        
+        document.getElementById('projModalType').textContent = p.type;
+        document.getElementById('projModalTitle').textContent = p.title;
+        document.getElementById('projModalIntro').textContent = p.intro;
+        document.getElementById('projModalTech').innerHTML = (p.tech||[]).map(t=>`<span class="skill-pill">${esc(t)}</span>`).join('');
+        document.getElementById('projModalContrib').innerHTML = (p.contributions||[]).map(c=>`<li>${esc(c)}</li>`).join('');
+        
+        const demoBtn = document.getElementById('projModalDemo');
+        if (p.demo && p.demo !== '#') {
+          demoBtn.href = p.demo;
+          demoBtn.style.display = 'inline-flex';
+        } else {
+          demoBtn.style.display = 'none';
+        }
+
+        const sourceBtn = document.getElementById('projModalSource');
+        if (p.source && p.source !== '#') {
+          sourceBtn.href = p.source;
+          sourceBtn.style.display = 'inline-flex';
+        } else {
+          sourceBtn.style.display = 'none';
+        }
+
+        const pipContainer = document.getElementById('pipContainer');
+        const pipIframe = document.getElementById('pipIframe');
+        if (p.demo && p.demo.startsWith('http')) {
+          pipIframe.src = p.demo;
+          pipContainer.style.display = 'block';
+        } else {
+          pipContainer.style.display = 'none';
+          pipIframe.src = 'about:blank';
+        }
+
+        openModal('projModal');
+      };
+
+      window.prevProjectDetail = function() {
+        if (!appData.projects || !appData.projects.length) return;
+        currentProjectIdx = (currentProjectIdx - 1 + appData.projects.length) % appData.projects.length;
+        openProjModal(currentProjectIdx);
+      };
+
+      window.nextProjectDetail = function() {
+        if (!appData.projects || !appData.projects.length) return;
+        currentProjectIdx = (currentProjectIdx + 1) % appData.projects.length;
+        openProjModal(currentProjectIdx);
+      };
+
+      let currentCertIdx = 0;
+      let lightboxZoomScale = 1;
+
+      function renderCertificates() {
+        const certs = appData.certificates || [];
+        if (certs.length === 0) {
+          document.getElementById('certsGrid').innerHTML = `
+            <div style="grid-column:1/-1; text-align:center; padding:40px 20px; border:1px dashed var(--border); border-radius:var(--radius-md); color:var(--text-dim); font-family:var(--font-mono);">
+              暂未上传证书图片，点击右上角 “上传荣誉证书” 按钮快速添加
+            </div>
+          `;
+          return;
+        }
+
+        document.getElementById('certsGrid').innerHTML = certs.map((c, i)=>`
+          <div class="cert-thumb reveal" onclick="openLightboxIndex(${i})">
+            <img src="${esc(c)}" alt="荣誉证书 ${i+1}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <div class="cert-fallback" style="display:none; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; background:var(--bg-alt); font-family:var(--font-mono); font-size:0.85rem; color:var(--text-dim);">
+              荣誉证书样本 ${i+1}
+            </div>
+            <div class="cert-caption-overlay">证书文件 #${i+1} · 点击放大</div>
+          </div>
+        `).join('');
+        initScrollReveals();
+      }
+
+      window.openLightboxIndex = function(idx) {
+        currentCertIdx = idx;
+        const certs = appData.certificates || [];
+        if (!certs.length) return;
+        const src = certs[currentCertIdx];
+        document.getElementById('lightboxImg').src = src;
+        resetLightboxZoom();
+        openModal('lightbox');
+      };
+
+      window.prevLightboxImage = function() {
+        const certs = appData.certificates || [];
+        if (!certs.length) return;
+        currentCertIdx = (currentCertIdx - 1 + certs.length) % certs.length;
+        openLightboxIndex(currentCertIdx);
+      };
+
+      window.nextLightboxImage = function() {
+        const certs = appData.certificates || [];
+        if (!certs.length) return;
+        currentCertIdx = (currentCertIdx + 1) % certs.length;
+        openLightboxIndex(currentCertIdx);
+      };
+
+      window.zoomLightbox = function(delta) {
+        lightboxZoomScale = Math.min(3, Math.max(0.5, lightboxZoomScale + delta));
+        document.getElementById('lightboxImg').style.transform = `scale(${lightboxZoomScale})`;
+      };
+
+      window.resetLightboxZoom = function() {
+        lightboxZoomScale = 1;
+        document.getElementById('lightboxImg').style.transform = `scale(1)`;
+      };
+
+      window.deleteCurrentCert = function() {
+        if (!appData.certificates || !appData.certificates.length) return;
+        appData.certificates.splice(currentCertIdx, 1);
+        saveData();
+        renderCertificates();
+        closeModal('lightbox');
+        showToast('🗑️ 已删除该荣誉证书');
+      };
+
+      function renderContact() {
+        const p = appData.profile;
+        document.getElementById('contactGrid').innerHTML = `
+          <a class="contact-item" href="mailto:${esc(p.email)}">
+            <svg viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <div><div class="lbl">邮箱</div><div class="val">${esc(p.email)}</div></div>
+          </a>
+          <div class="contact-item">
+            <svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+            <div><div class="lbl">电话</div><div class="val">${esc(p.phone)}</div></div>
+          </div>
+          <a class="contact-item" href="${esc(p.github)}" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            <div><div class="lbl">GitHub</div><div class="val">${esc(p.github)}</div></div>
+          </a>
+        `;
+      }
+
+      window.openModal = function(id) { document.getElementById(id).classList.add('open'); };
+      window.closeModal = function(id) {
+        document.getElementById(id).classList.remove('open');
+        if (id === 'projModal') {
+          document.getElementById('pipIframe').src = 'about:blank';
+        }
+      };
+
+      function copyEmail() {
+        navigator.clipboard.writeText(appData.profile.email).then(()=> showToast('✅ 邮箱已复制到剪贴板'));
+      }
+      document.getElementById('copyEmailBtn').onclick = copyEmail;
+      document.getElementById('copyEmailBtn2').onclick = copyEmail;
+
+      const themeBtn = document.getElementById('themeToggle');
+      themeBtn.onclick = () => {
+        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+        document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+      };
+
+      function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.classList.add('show');
+        setTimeout(()=> t.classList.remove('show'), 2500);
+      }
+
+      document.getElementById('openAdminBtn').onclick = () => {
+        openModal('pinModal');
+      };
+
+      window.submitPin = function() {
+        const input = document.getElementById('pinInput').value;
+        if (!input) return;
+        closeModal('pinModal');
+        syncAdminForm();
+        document.getElementById('adminDrawer').classList.add('open');
+      };
+
+      window.closeAdmin = function() { document.getElementById('adminDrawer').classList.remove('open'); };
+
+      function syncAdminForm() {
+        const p = appData.profile;
+        document.getElementById('adminName').value = p.name;
+        document.getElementById('adminTitle').value = p.title;
+        document.getElementById('adminAvatar').value = p.avatar || '';
+        document.getElementById('adminEmail').value = p.email;
+        document.getElementById('adminPhone').value = p.phone;
+        document.getElementById('adminCity').value = p.city;
+        document.getElementById('adminGithub').value = p.github;
+        document.getElementById('adminIntro').value = p.intro;
+        document.getElementById('adminBadges').value = (appData.badges||[]).join(', ');
+        document.getElementById('adminSchool').value = p.school;
+        document.getElementById('adminMajor').value = p.major;
+        document.getElementById('adminPeriod').value = p.period;
+
+        document.getElementById('adminSkills').value = Object.entries(appData.skills||{}).map(([k,v])=> `${k}:${v.join(',')}`).join('\n');
+        document.getElementById('adminStrengths').value = (appData.interests.strengths||[]).join('\n');
+        document.getElementById('adminHobbies').value = (appData.interests.hobbies||[]).join('\n');
+
+        renderAdminCertList();
+      }
+
+      function renderAdminCertList() {
+        const list = document.getElementById('adminCertListContainer');
+        if (!list) return;
+        const certs = appData.certificates || [];
+        if (!certs.length) {
+          list.innerHTML = '<div style="font-size:0.78rem; color:var(--text-dim); grid-column:1/-1;">暂无证书文件</div>';
+          return;
+        }
+        list.innerHTML = certs.map((c, i) => `
+          <div style="position:relative; aspect-ratio:4/3; border-radius:6px; overflow:hidden; border:1px solid var(--border); background:var(--bg-alt);">
+            <img src="${esc(c)}" style="width:100%; height:100%; object-fit:cover;">
+            <button type="button" onclick="deleteAdminCert(${i})" title="删除该证书" style="position:absolute; top:3px; right:3px; background:rgba(239,68,68,0.88); color:#fff; border:none; border-radius:50%; width:20px; height:20px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1;">×</button>
+          </div>
+        `).join('');
+      }
+
+      window.deleteAdminCert = function(idx) {
+        if (!appData.certificates || !appData.certificates[idx]) return;
+        appData.certificates.splice(idx, 1);
+        saveData();
+        renderCertificates();
+        renderAdminCertList();
+        showToast('🗑️ 已删除该证书');
+      };
+
+      window.saveAdmin = function() {
+        const p = appData.profile;
+        p.name = document.getElementById('adminName').value;
+        p.title = document.getElementById('adminTitle').value;
+        p.avatar = document.getElementById('adminAvatar').value;
+        p.email = document.getElementById('adminEmail').value;
+        p.phone = document.getElementById('adminPhone').value;
+        p.city = document.getElementById('adminCity').value;
+        p.github = document.getElementById('adminGithub').value;
+        p.intro = document.getElementById('adminIntro').value;
+        appData.badges = document.getElementById('adminBadges').value.split(',').map(s=>s.trim()).filter(Boolean);
+
+        p.school = document.getElementById('adminSchool').value;
+        p.major = document.getElementById('adminMajor').value;
+        p.period = document.getElementById('adminPeriod').value;
+
+        const skillsRaw = document.getElementById('adminSkills').value.split('\n');
+        const newSkills = {};
+        skillsRaw.forEach(line=>{
+          const [cat, list] = line.split(':');
+          if (cat && list) newSkills[cat.trim()] = list.split(',').map(s=>s.trim()).filter(Boolean);
+        });
+        if (Object.keys(newSkills).length) appData.skills = newSkills;
+
+        appData.interests.strengths = document.getElementById('adminStrengths').value.split('\n').map(s=>s.trim()).filter(Boolean);
+        appData.interests.hobbies = document.getElementById('adminHobbies').value.split('\n').map(s=>s.trim()).filter(Boolean);
+
+        saveData();
+        renderAll();
+        closeAdmin();
+        showToast('✅ 数据已更新');
+      };
+
+      window.exportBackup = function() {
+        const blob = new Blob([JSON.stringify(appData, null, 2)], {type: 'application/json'});
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `resume-backup-${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+      };
+
+      window.resetDefault = function() {
+        localStorage.removeItem(STORAGE_KEY);
+        appData = clone(DEFAULT_DATA);
+        renderAll();
+        closeAdmin();
+        showToast('已恢复默认配置');
+      };
+
+      // Admin File upload processing
+      const adminAvatarFile = document.getElementById('adminAvatarFile');
+      const adminCertBatchFile = document.getElementById('adminCertBatchFile');
+
+      function processAvatarFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const base64Img = e.target.result;
+          appData.profile.avatar = base64Img;
+          saveData();
+          renderAll();
+          const adminInput = document.getElementById('adminAvatar');
+          if (adminInput) adminInput.value = base64Img;
+          showToast('✅ 头像照片已更新');
+        };
+        reader.readAsDataURL(file);
+      }
+
+      if (adminAvatarFile) {
+        adminAvatarFile.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            processAvatarFile(e.target.files[0]);
+          }
+        });
+      }
+
+      function processCertFiles(files) {
+        if (!files || !files.length) return;
+        let loadedCount = 0;
+        const totalFiles = files.length;
+
+        Array.from(files).forEach(file => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const base64Img = e.target.result;
+            if (!Array.isArray(appData.certificates)) {
+              appData.certificates = [];
+            }
+            appData.certificates.push(base64Img);
+            loadedCount++;
+            if (loadedCount === totalFiles) {
+              saveData();
+              renderCertificates();
+              renderAdminCertList();
+              showToast(`✅ 成功添加 ${totalFiles} 张证书并自动保存`);
+            }
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      if (adminCertBatchFile) {
+        adminCertBatchFile.addEventListener('change', (e) => {
+          processCertFiles(e.target.files);
+          e.target.value = '';
+        });
+      }
+
+      const canvas = document.getElementById('interactive-canvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let mouseX = 0, mouseY = 0;
+      let scrollY = 0;
+
+      function resizeCanvas() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      document.addEventListener('mousemove', e => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        document.querySelectorAll('.spotlight').forEach(card => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+        });
+      });
+
+      const numParticles = 95;
+      const particles = [];
+      const radius = 220;
+
+      for (let i = 0; i < numParticles; i++) {
+        const theta = Math.acos(2 * Math.random() - 1);
+        const phi = 2 * Math.PI * Math.random();
+        particles.push({
+          x: radius * Math.sin(theta) * Math.cos(phi),
+          y: radius * Math.sin(theta) * Math.sin(phi),
+          z: radius * Math.cos(theta),
+          baseX: radius * Math.sin(theta) * Math.cos(phi),
+          baseY: radius * Math.sin(theta) * Math.sin(phi),
+          baseZ: radius * Math.cos(theta)
+        });
+      }
+
+      let angleX = 0.002;
+      let angleY = 0.002;
+
+      function draw3DSphere() {
+        ctx.clearRect(0, 0, width, height);
+
+        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+        const particleColor = isDark ? 'rgba(56, 189, 248, 0.45)' : 'rgba(2, 132, 199, 0.35)';
+        const lineColor = isDark ? 'rgba(129, 140, 248, 0.12)' : 'rgba(79, 70, 229, 0.08)';
+
+        angleY = (mouseX - width / 2) * 0.00003 + (scrollY * 0.00005);
+        angleX = (mouseY - height / 2) * 0.00003;
+
+        const cosX = Math.cos(angleX), sinX = Math.sin(angleX);
+        const cosY = Math.cos(angleY), sinY = Math.sin(angleY);
+
+        const centerX = width * 0.75;
+        const centerY = height * 0.45;
+
+        const projected = [];
+
+        particles.forEach(p => {
+          let x1 = p.x * cosY - p.z * sinY;
+          let z1 = p.z * cosY + p.x * sinY;
+
+          let y1 = p.y * cosX - z1 * sinX;
+          let z2 = z1 * cosX + p.y * sinX;
+
+          p.x = x1; p.y = y1; p.z = z2;
+
+          const fov = 350;
+          const scale = fov / (fov + z2 + 300);
+          const px = x1 * scale + centerX;
+          const py = y1 * scale + centerY;
+
+          projected.push({ x: px, y: py, scale: scale, z: z2 });
+        });
+
+        for (let i = 0; i < projected.length; i++) {
+          for (let j = i + 1; j < projected.length; j++) {
+            const p1 = projected[i];
+            const p2 = projected[j];
+            const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+
+            if (dist < 85) {
+              ctx.strokeStyle = lineColor;
+              ctx.lineWidth = (1 - dist / 85) * p1.scale;
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        projected.forEach(p => {
+          ctx.fillStyle = particleColor;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, Math.max(1, 2.5 * p.scale), 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        requestAnimationFrame(draw3DSphere);
+      }
+      draw3DSphere();
+
+      let isScrolled = false;
+      const navbar = document.getElementById('navbar');
+
+      window.addEventListener('scroll', () => {
+        scrollY = window.scrollY || document.documentElement.scrollTop;
+        const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (scrollY / docHeight) * 100;
+        document.getElementById('scrollProgress').style.width = scrolled + '%';
+
+        if (scrollY > 40 && !isScrolled) {
+          isScrolled = true;
+          navbar.classList.add('scrolled');
+        } else if (scrollY <= 40 && isScrolled) {
+          isScrolled = false;
+          navbar.classList.remove('scrolled');
+        }
+
+        const watermarks = document.querySelectorAll('.bg-watermark');
+        watermarks.forEach(wm => {
+          const speed = parseFloat(wm.getAttribute('data-parallax')) || -0.1;
+          wm.style.transform = `translateY(${scrollY * speed}px)`;
+        });
+
+        const sections = ['home', 'about', 'education', 'skills', 'experience', 'projects', 'certificates', 'contact'];
+        sections.forEach(secId => {
+          const sec = document.getElementById(secId);
+          if (sec) {
+            const r = sec.getBoundingClientRect();
+            if (r.top <= 220 && r.bottom >= 220) {
+              document.querySelectorAll('.side-counter-item').forEach(item => {
+                item.classList.toggle('active', item.getAttribute('data-section') === secId);
+              });
+            }
+          }
+        });
+      });
+
+      const mobileToggle = document.getElementById('mobileToggle');
+      const mobileMenu = document.getElementById('mobileMenu');
+      if (mobileToggle && mobileMenu) {
+        mobileToggle.onclick = () => mobileMenu.classList.toggle('open');
+        window.closeMobile = () => mobileMenu.classList.remove('open');
+      }
+
+      document.addEventListener('keydown', e => {
+        if (e.ctrlKey && (e.key === 'm' || e.key === 'M')) {
+          e.preventDefault();
+          document.getElementById('openAdminBtn').click();
+        }
+        if (e.key === 'Escape') {
+          closeModal('lightbox');
+          closeModal('projModal');
+          closeModal('pinModal');
+          closeAdmin();
+        }
+        if (e.key === 'ArrowLeft') {
+          const lightbox = document.getElementById('lightbox');
+          const projModal = document.getElementById('projModal');
+          if (lightbox && lightbox.classList.contains('open')) prevLightboxImage();
+          else if (projModal && projModal.classList.contains('open')) prevProjectDetail();
+        }
+        if (e.key === 'ArrowRight') {
+          const lightbox = document.getElementById('lightbox');
+          const projModal = document.getElementById('projModal');
+          if (lightbox && lightbox.classList.contains('open')) nextLightboxImage();
+          else if (projModal && projModal.classList.contains('open')) nextProjectDetail();
+        }
+      });
+
+      // App Boot Initialization
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
