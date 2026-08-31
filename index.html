@@ -1510,6 +1510,16 @@
             parsed.profile.avatar = DEFAULT_DATA.profile.avatar;
           }
           appData = Object.assign({}, DEFAULT_DATA, parsed);
+          // 智能合并证书：DEFAULT 的（带元信息）放最前，用户上传的独有项追加在后，避免 localStorage 覆盖默认 6 张
+          if (Array.isArray(appData.certificates)) {
+            const defSrcs = new Set((DEFAULT_DATA.certificates || []).map(c => (typeof c === 'string' ? c : (c && c.src))).filter(Boolean));
+            const userCerts = Array.isArray(parsed.certificates) ? parsed.certificates : [];
+            const userOnly = userCerts.filter(c => {
+              const src = typeof c === 'string' ? c : (c && c.src);
+              return src && !defSrcs.has(src);
+            });
+            appData.certificates = [...(DEFAULT_DATA.certificates || []), ...userOnly];
+          }
         }
       } catch(e){}
 
