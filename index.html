@@ -806,15 +806,26 @@
       flex-direction: column; align-items: center; justify-content: center;
     }
     .cert-thumb img {
-      width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--ease);
+      width: 100%; height: 100%; object-fit: contain; background: var(--bg-alt); transition: transform 0.5s var(--ease);
     }
     .cert-thumb:hover { transform: translateY(-4px) scale(1.02); border-color: var(--primary); box-shadow: 0 12px 28px var(--primary-glow); }
     .cert-thumb:hover img { transform: scale(1.06); }
     .cert-caption-overlay {
-      position: absolute; bottom: 0; left: 0; right: 0; padding: 10px;
-      background: linear-gradient(0deg, rgba(8,9,12,0.88), transparent);
-      color: var(--text-main); font-size: 0.8rem; font-family: var(--font-mono); text-align: center;
+      position: absolute; bottom: 0; left: 0; right: 0; padding: 10px 12px;
+      background: linear-gradient(0deg, rgba(8,9,12,0.95) 55%, transparent);
+      color: var(--text-main); text-align: left;
     }
+    .cert-caption-overlay .cert-title {
+      font-size: 0.88rem; font-weight: 700; line-height: 1.35; word-break: break-word;
+    }
+    .cert-caption-overlay .cert-meta {
+      margin-top: 3px; font-size: 0.7rem; font-family: var(--font-mono);
+      color: var(--text-muted); display: flex; justify-content: space-between; gap: 8px;
+    }
+    .cert-caption-overlay .cert-meta .cert-issuer {
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0;
+    }
+    .cert-caption-overlay .cert-meta .cert-date { color: var(--primary); flex-shrink: 0; }
 
     .contact-card { text-align: center; padding: 60px 28px; }
     .contact-grid {
@@ -1444,7 +1455,50 @@
           strengths: ['团队协作与沟通', '自主学习能力', '组织协调', '服务与应变', '信息整理与可视化'],
           hobbies: ['AI智能体编程', '健体功能性训练', '开源技术探索']
         },
-        certificates: ['certs/cert-1.jpg', 'certs/cert-2.jpg']
+        certificates: [
+          {
+            src: 'certs/cert-huawei-ai-intro.jpg',
+            title: '人工智能初识微认证',
+            issuer: '华为 (Huawei)',
+            date: '2026.08',
+            alt: '华为人工智能初识微认证证书'
+          },
+          {
+            src: 'certs/cert-huawei-cloud-ai-voice.jpg',
+            title: '人工智能技能认证 · AI 智能语音识别计算器',
+            issuer: '华为云 (Huawei Cloud)',
+            date: '2026.08',
+            alt: '华为云微认证 AI 智能语音识别证书'
+          },
+          {
+            src: 'certs/cert-iflytek-finetune.jpg',
+            title: '微调工程师认证',
+            issuer: '科大讯飞 AI 大学堂',
+            date: '2026-08-26',
+            alt: '科大讯飞 AI 大学堂微调工程师认证证书'
+          },
+          {
+            src: 'certs/cert-iflytek-agent.jpg',
+            title: '智能体工程师认证',
+            issuer: '科大讯飞 AI 大学堂',
+            date: '2026-08-26',
+            alt: '科大讯飞 AI 大学堂智能体工程师认证证书'
+          },
+          {
+            src: 'certs/cert-iflytek-rag.jpg',
+            title: 'RAG 工程师认证',
+            issuer: '科大讯飞 AI 大学堂',
+            date: '2026-08-28',
+            alt: '科大讯飞 AI 大学堂 RAG 工程师认证证书'
+          },
+          {
+            src: 'certs/cert-iflytek-prompt.jpg',
+            title: 'Prompt 工程师认证',
+            issuer: '科大讯飞 AI 大学堂',
+            date: '2026-08-25',
+            alt: '科大讯飞 AI 大学堂 Prompt 工程师认证证书'
+          }
+        ]
       };
 
       let appData = clone(DEFAULT_DATA);
@@ -1785,15 +1839,25 @@
           return;
         }
 
-        document.getElementById('certsGrid').innerHTML = certs.map((c, i)=>`
+        document.getElementById('certsGrid').innerHTML = certs.map((c, i)=>{
+          // 后向兼容：旧数据是字符串 src，新数据是 {src, title, issuer, date, alt}
+          const src = typeof c === 'string' ? c : (c && c.src);
+          const title = (c && c.title) || `证书 ${i+1}`;
+          const issuer = (c && c.issuer) || '';
+          const date = (c && c.date) || '';
+          const alt = (c && c.alt) || title;
+          return `
           <div class="cert-thumb reveal" onclick="openLightboxIndex(${i})">
-            <img src="${esc(c)}" alt="荣誉证书 ${i+1}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+            <img src="${esc(src)}" alt="${esc(alt)}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
             <div class="cert-fallback" style="display:none; flex-direction:column; align-items:center; justify-content:center; width:100%; height:100%; background:var(--bg-alt); font-family:var(--font-mono); font-size:0.85rem; color:var(--text-dim);">
               荣誉证书样本 ${i+1}
             </div>
-            <div class="cert-caption-overlay">证书文件 #${i+1} · 点击放大</div>
-          </div>
-        `).join('');
+            <div class="cert-caption-overlay">
+              <div class="cert-title">${esc(title)}</div>
+              ${(issuer||date) ? `<div class="cert-meta"><span class="cert-issuer" title="${esc(issuer)}">${esc(issuer)||'&nbsp;'}</span><span class="cert-date">${esc(date)||'&nbsp;'}</span></div>` : ''}
+            </div>
+          </div>`;
+        }).join('');
         initScrollReveals();
       }
 
@@ -1801,7 +1865,8 @@
         currentCertIdx = idx;
         const certs = appData.certificates || [];
         if (!certs.length) return;
-        const src = certs[currentCertIdx];
+        const item = certs[currentCertIdx];
+        const src = typeof item === 'string' ? item : (item && item.src);
         document.getElementById('lightboxImg').src = src;
         resetLightboxZoom();
         openModal('lightbox');
@@ -1930,7 +1995,7 @@
         }
         list.innerHTML = certs.map((c, i) => `
           <div style="position:relative; aspect-ratio:4/3; border-radius:6px; overflow:hidden; border:1px solid var(--border); background:var(--bg-alt);">
-            <img src="${esc(c)}" style="width:100%; height:100%; object-fit:cover;">
+            <img src="${esc(typeof c === 'string' ? c : (c && c.src))}" style="width:100%; height:100%; object-fit:contain;" alt="${esc((c && c.alt) || '证书 ' + (i+1))}">
             <button type="button" onclick="deleteAdminCert(${i})" title="删除该证书" style="position:absolute; top:3px; right:3px; background:rgba(239,68,68,0.88); color:#fff; border:none; border-radius:50%; width:20px; height:20px; font-size:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; line-height:1;">×</button>
           </div>
         `).join('');
