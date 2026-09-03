@@ -769,6 +769,173 @@
       font-family: var(--font-mono); background: linear-gradient(135deg, var(--bg-alt), var(--surface));
     }
 
+    /* ========== 3D Deck 核心作品堆栈枢纽 ========== */
+    .deck-stage-wrapper {
+      position: relative; width: 100%; max-width: 560px; height: 360px;
+      margin: 14px auto 22px; perspective: 1500px;
+    }
+    .deck-item-card {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      border-radius: var(--radius-lg); background: var(--surface-glass);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border-strong); padding: 22px 24px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      text-align: left; cursor: pointer; box-shadow: var(--shadow-deck);
+      transform-style: preserve-3d;
+      transition: transform 0.65s var(--ease), opacity 0.65s var(--ease), border-color 0.35s var(--ease);
+      will-change: transform, opacity;
+    }
+    .deck-item-card[data-pos="0"] {
+      transform: translate3d(0, 0, 0) scale(1); z-index: 5; opacity: 1; border-color: var(--primary);
+    }
+    .deck-item-card[data-pos="1"] {
+      transform: translate3d(0, 22px, -80px) scale(0.93) rotate(2deg);
+      z-index: 4; opacity: 0.85; filter: brightness(0.85);
+    }
+    .deck-item-card[data-pos="2"] {
+      transform: translate3d(0, 44px, -160px) scale(0.86) rotate(-2deg);
+      z-index: 3; opacity: 0.65; filter: brightness(0.7);
+    }
+    .deck-stage-wrapper:hover .deck-item-card[data-pos="0"] {
+      transform: translate3d(0, -6px, 15px) scale(1.02);
+      box-shadow: 0 35px 70px rgba(0,0,0,0.9), 0 0 35px var(--primary-glow);
+    }
+    .deck-stage-wrapper:hover .deck-item-card[data-pos="1"] {
+      transform: translate3d(28px, 26px, -70px) scale(0.94) rotate(4deg); opacity: 0.9;
+    }
+    .deck-stage-wrapper:hover .deck-item-card[data-pos="2"] {
+      transform: translate3d(-28px, 50px, -140px) scale(0.88) rotate(-4deg); opacity: 0.78;
+    }
+    .deck-head {
+      display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+    }
+    .deck-index-num {
+      font-family: var(--font-mono); font-size: 2rem; font-weight: 900;
+      color: var(--primary); line-height: 1; letter-spacing: -0.04em;
+    }
+    .deck-chip {
+      font-family: var(--font-mono); font-size: 0.72rem; padding: 4px 12px;
+      border-radius: var(--radius-pill); background: var(--pill-bg);
+      border: 1px solid var(--pill-border); color: var(--text-muted);
+    }
+    .deck-body-title {
+      font-size: 1.22rem; font-weight: 800; color: var(--text-main); line-height: 1.3;
+      margin-top: 6px; margin-bottom: 4px;
+    }
+    .deck-body-sub {
+      font-family: var(--font-mono); font-size: 0.76rem; color: var(--primary);
+      display: flex; align-items: center; gap: 6px; font-weight: 600;
+    }
+    .deck-schematic-preview {
+      width: 100%; height: 96px; border-radius: var(--radius-md);
+      overflow: hidden; border: 1px solid var(--border);
+      background: var(--bg-alt); margin: 10px 0;
+      display: flex; align-items: center; justify-content: center; position: relative;
+    }
+    .deck-schematic-preview svg { width: 100%; height: 100%; object-fit: cover; }
+    .deck-foot {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-top: 10px; border-top: 1px dashed var(--border); gap: 8px;
+    }
+    .deck-hint {
+      font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-dim);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .deck-btn-cta {
+      font-family: var(--font-mono); font-size: 0.74rem; font-weight: 700;
+      padding: 6px 12px; border-radius: var(--radius-pill);
+      background: var(--primary); color: #08090C; border: none; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 4px; transition: transform 0.2s var(--ease);
+    }
+    .deck-btn-cta:hover { transform: scale(1.05); }
+
+    /* 控制条与圆点 */
+    .deck-switcher-row {
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      margin-bottom: 32px;
+    }
+    .deck-arrow-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: var(--surface); border: 1px solid var(--border-strong);
+      color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; transition: all 0.25s var(--ease);
+    }
+    .deck-arrow-btn:hover { border-color: var(--primary); color: var(--primary); transform: scale(1.08); }
+    .deck-dots-bar { display: flex; gap: 8px; align-items: center; }
+    .deck-dot-indicator {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--border-strong);
+      transition: all 0.3s var(--ease); cursor: pointer;
+    }
+    .deck-dot-indicator.active {
+      width: 22px; border-radius: var(--radius-pill); background: var(--primary);
+      box-shadow: 0 0 10px var(--primary);
+    }
+
+    /* ========== 项目卡片悬停毛玻璃抽屉 ========== */
+    .project-card-drawer {
+      position: absolute; inset: 0;
+      background: var(--surface-glass);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border-radius: var(--radius-lg); padding: 22px;
+      display: flex; flex-direction: column; justify-content: space-between;
+      opacity: 0; pointer-events: none;
+      transform: translateY(18px);
+      transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+      z-index: 12; border: 1px solid var(--primary);
+      box-shadow: inset 0 0 20px var(--primary-subtle);
+    }
+    .project-card:hover .project-card-drawer { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .drawer-header { border-bottom: 1px dashed var(--border-strong); padding-bottom: 10px; margin-bottom: 12px; }
+    .drawer-badge {
+      font-family: var(--font-mono); font-size: 0.68rem; color: var(--primary);
+      font-weight: 700; letter-spacing: 0.06em;
+    }
+    .drawer-title {
+      font-size: 1.1rem; font-weight: 800; color: var(--text-main); margin-top: 4px;
+    }
+    .drawer-intro {
+      font-size: 0.84rem; color: var(--text-muted); line-height: 1.55; margin-bottom: 12px;
+      display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .drawer-contributions { list-style: none; margin: 0 0 12px; }
+    .drawer-contributions li {
+      position: relative; padding-left: 16px; margin-bottom: 4px;
+      font-size: 0.8rem; color: var(--text-main); line-height: 1.4;
+    }
+    .drawer-contributions li::before {
+      content: '✔'; position: absolute; left: 0; color: var(--primary);
+      font-size: 0.72rem; font-weight: 900;
+    }
+    .drawer-actions { display: flex; gap: 8px; margin-top: auto; }
+    .drawer-btn {
+      flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 8px 10px; border-radius: var(--radius-sm); font-size: 0.78rem; font-weight: 700;
+      text-decoration: none; font-family: var(--font-mono); transition: all 0.2s var(--ease);
+      cursor: pointer;
+    }
+    .drawer-btn-primary {
+      background: var(--primary); color: #08090C; border: 1px solid var(--primary);
+    }
+    .drawer-btn-primary:hover { opacity: 0.92; transform: translateY(-1px); }
+    .drawer-btn-outline {
+      background: var(--pill-bg); color: var(--text-main); border: 1px solid var(--border-strong);
+    }
+    .drawer-btn-outline:hover { border-color: var(--text-main); transform: translateY(-1px); }
+
+    @media (max-width: 720px) {
+      .deck-stage-wrapper { height: 320px; }
+      .deck-body-title { font-size: 1.05rem; }
+      .deck-schematic-preview { height: 76px; }
+      .project-card-drawer { padding: 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .deck-item-card[data-pos] { transition: opacity 0.01s; }
+      .project-card-drawer { transition: opacity 0.01s; }
+    }
+    @media print {
+      .deck-stage-wrapper, .deck-switcher-row, .project-card-drawer { display: none !important; }
+    }
+
     .project-type-tag {
       position: absolute; top: 14px; left: 14px;
       font-family: var(--font-mono); font-size: 0.72rem; font-weight: 700;
@@ -1171,7 +1338,16 @@
           <div>
             <div class="index-tag">05 // SELECTED WORKS</div>
             <h2 class="section-title">核心项目作品集</h2>
+            <p class="section-sub">悬停可触发毛玻璃全案抽屉，点击下方堆栈卡片可开启画中画深度体验。</p>
           </div>
+        </div>
+
+        <!-- 3D 核心作品堆栈枢纽 -->
+        <div class="deck-stage-wrapper reveal" id="deckStage" aria-label="核心作品 3D 堆栈轮播"></div>
+        <div class="deck-switcher-row reveal" aria-label="作品轮播控制">
+          <button type="button" class="deck-arrow-btn" onclick="cycleDeckPrev()" aria-label="上一个作品">‹</button>
+          <div class="deck-dots-bar" id="deckDotsBar"></div>
+          <button type="button" class="deck-arrow-btn" onclick="cycleDeckNext()" aria-label="下一个作品">›</button>
         </div>
 
         <div class="projects-grid" id="projectsGrid"></div>
@@ -1441,14 +1617,18 @@
             source: 'https://github.com/wen-6-dao/pixel-tank-wasteland'
           },
           {
-            title: '铁道运输学院信息门户网站',
-            type: '网页设计 & 数据可视化',
+            title: '铁道建筑学院信息门户',
+            type: '信息门户 / 网页设计',
             role: '独立全栈开发',
-            intro: '面向学院的展示型信息门户，卡片式布局与铁路动车主题动画，集成 83 条爬虫抓取数据。',
-            tech: ['HTML/CSS/JS', 'Python', 'BeautifulSoup'],
-            contributions: ['独立编写 Python 爬虫抓取 83 条公开数据', '设计复兴号 SVG 滚动动画与交互弹窗'],
-            demo: 'https://wen-6-dao.github.io/hntky-crawler/',
-            source: 'https://github.com/wen-6-dao/hntky-crawler'
+            intro: '面向铁道建筑学院师生的信息分享与技术交流平台（非官方站点），具备高响应性交互、BIM 与智慧铁路虚拟漫游、专业全景对比、师资展示与即时搜索。',
+            tech: ['React', 'Vite', 'Tailwind CSS', 'JavaScript'],
+            contributions: [
+              '基于 React + Vite + Tailwind CSS 构建单页应用',
+              '实现 BIM / 智慧铁路虚拟漫游、专业全景对比等核心模块',
+              '上线部署至 GitHub Pages 并支持即时搜索交互'
+            ],
+            demo: 'https://wen-6-dao.github.io/website/',
+            source: ''
           }
         ],
         interests: {
@@ -1497,11 +1677,30 @@
             issuer: '科大讯飞 AI 大学堂',
             date: '2026-08-25',
             alt: '科大讯飞 AI 大学堂 Prompt 工程师认证证书'
+          },
+          {
+            src: 'certs/cert-damo-ait-junior.jpg',
+            title: '人工智能训练师证书（初级）',
+            issuer: '阿里达摩院 · 机器智能技术事业部',
+            date: '2026-07-28',
+            alt: '阿里达摩院人工智能训练师初级证书 · 编号 AIT260728152025000173'
+          },
+          {
+            src: 'certs/cert-damo-ait-advanced.jpg',
+            title: '人工智能训练师证书（高级）',
+            issuer: '阿里达摩院 · 机器智能技术事业部',
+            date: '2026-08-11',
+            alt: '阿里达摩院人工智能训练师高级证书 · 编号 AIT260811202007000132'
           }
         ]
       };
 
       let appData = clone(DEFAULT_DATA);
+      // 已被移除的项目 demo 列表（用于过滤旧 localStorage 缓存，确保被删除的项目不会再显示）
+      const REMOVED_PROJECT_DEMOS = new Set([
+        'https://wen-6-dao.github.io/hntky-crawler/'
+      ]);
+
       try {
         const local = localStorage.getItem(STORAGE_KEY);
         if (local) {
@@ -1519,6 +1718,18 @@
               return src && !defSrcs.has(src);
             });
             appData.certificates = [...(DEFAULT_DATA.certificates || []), ...userOnly];
+          }
+          // 智能合并项目：DEFAULT 中 demo 唯一且不在 localStorage 里的项目（如新增的 website）追加到末尾，避免旧数据覆盖新项目
+          // 同时过滤掉 demo 在 REMOVED_PROJECT_DEMOS 中（即已被移除）的旧缓存项
+          if (Array.isArray(appData.projects)) {
+            const defProjs = DEFAULT_DATA.projects || [];
+            const userProjs = Array.isArray(parsed.projects) ? parsed.projects : [];
+            const cleanedUser = userProjs.filter(p => p && (!p.demo || !REMOVED_PROJECT_DEMOS.has(p.demo)));
+            const userDemos = new Set(cleanedUser.map(p => (p && p.demo) || '').filter(Boolean));
+            const defOnly = defProjs.filter(p => p && p.demo && !userDemos.has(p.demo));
+            if (defOnly.length || cleanedUser.length !== userProjs.length) {
+              appData.projects = [...cleanedUser, ...defOnly];
+            }
           }
         }
       } catch(e){}
@@ -1777,10 +1988,119 @@
                 ${(p.source && p.source !== '#') ? `<a href="${esc(p.source)}" target="_blank" rel="noopener" class="project-link" onclick="event.stopPropagation()">GitHub 源码</a>` : ''}
               </div>
             </div>
+            <div class="project-card-drawer" aria-hidden="true">
+              <div>
+                <div class="drawer-header">
+                  <div class="drawer-badge">// ${esc((p.type||'').toUpperCase())} · CASE FILE</div>
+                  <div class="drawer-title">${esc(p.title)}</div>
+                </div>
+                <p class="drawer-intro">${esc(p.intro||'')}</p>
+                <ul class="drawer-contributions">
+                  ${(p.contributions||[]).slice(0,3).map(c=>`<li>${esc(c)}</li>`).join('')}
+                </ul>
+                <div class="tag-cloud" style="margin-bottom:12px;">
+                  ${(p.tech||[]).map(t=>`<span class="skill-pill">${esc(t)}</span>`).join('')}
+                </div>
+              </div>
+              <div class="drawer-actions">
+                <button type="button" class="drawer-btn drawer-btn-primary" onclick="event.stopPropagation(); openProjModal(${i})">体验 ↗</button>
+                ${(p.demo && p.demo !== '#') ? `<a href="${esc(p.demo)}" target="_blank" rel="noopener" class="drawer-btn drawer-btn-outline" onclick="event.stopPropagation()">源码</a>` : '<button type="button" class="drawer-btn drawer-btn-outline" onclick="event.stopPropagation(); openProjModal('+i+')">解码</button>'}
+              </div>
+            </div>
           </div>
         `).join('');
         initScrollReveals();
+        renderDeck();
       }
+
+      /* ========== 3D Deck 堆栈轮播 ========== */
+      let deckTopIdx = 0;
+      let deckItems = [];
+
+      function renderDeck() {
+        const stage = document.getElementById('deckStage');
+        const dotsBar = document.getElementById('deckDotsBar');
+        if (!stage || !dotsBar) return;
+        const list = (appData.projects || []).slice(0, 3);
+        if (!list.length) { stage.innerHTML = ''; dotsBar.innerHTML = ''; return; }
+        deckItems = list.map((p, i) => {
+          const techShort = (p.tech || []).slice(0, 3).join(' · ') || '核心技术栈';
+          const svg = `<svg viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="dg${i}" x1="0" x2="1" y1="0" y2="1">
+                <stop offset="0%" stop-color="#38BDF8" stop-opacity=".25"/>
+                <stop offset="100%" stop-color="#818CF8" stop-opacity=".05"/>
+              </linearGradient>
+              <pattern id="dp${i}" width="14" height="14" patternUnits="userSpaceOnUse">
+                <path d="M 14 0 L 0 0 0 14" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="1"/>
+              </pattern>
+            </defs>
+            <rect width="200" height="80" fill="url(#dp${i})"/>
+            <rect width="200" height="80" fill="url(#dg${i})"/>
+            <path d="M0 60 Q50 ${40 - i*5} 100 50 T200 35" stroke="#38BDF8" stroke-width="1.5" fill="none" opacity=".7"/>
+            <circle cx="${50 + i*25}" cy="${50 - i*4}" r="3" fill="#38BDF8"/>
+            <circle cx="${130 + i*15}" cy="${42 - i*3}" r="3" fill="#818CF8"/>
+          </svg>`;
+          return `
+          <div class="deck-item-card spotlight" data-pos="${i}" data-index="${i}" onclick="setDeckTop(${i})">
+            <div class="deck-head">
+              <span class="deck-index-num">${String(i+1).padStart(2,'0')}</span>
+              <span class="deck-chip">${esc((p.type||'').toString().slice(0,24))}</span>
+            </div>
+            <div>
+              <div class="deck-body-title">${esc(p.title)}</div>
+              <div class="deck-body-sub">› ${esc((p.role||'独立开发').toString())} · ${esc(techShort.slice(0,38))}</div>
+            </div>
+            <div class="deck-schematic-preview">${svg}</div>
+            <div class="deck-foot">
+              <span class="deck-hint">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="var(--primary)" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8l4 4-4 4M8 12h8"/></svg>
+                点击卡片 · 开启全案
+              </span>
+              <button type="button" class="deck-btn-cta" onclick="event.stopPropagation(); openProjModal(${i})">探索全案 ↗</button>
+            </div>
+          </div>`;
+        }).join('');
+        stage.innerHTML = deckItems;
+        dotsBar.innerHTML = list.map((_, i) =>
+          `<span class="deck-dot-indicator ${i===0?'active':''}" onclick="setDeckTop(${i})" aria-label="切换到第${i+1}个作品"></span>`
+        ).join('');
+        applyDeckOrder();
+      }
+
+      function applyDeckOrder() {
+        const cards = document.querySelectorAll('#deckStage .deck-item-card');
+        const total = cards.length;
+        if (!total) return;
+        cards.forEach((c, idx) => {
+          let pos = (idx - deckTopIdx + total) % total;
+          c.setAttribute('data-pos', pos);
+        });
+        document.querySelectorAll('#deckDotsBar .deck-dot-indicator').forEach((d, idx) => {
+          d.classList.toggle('active', idx === deckTopIdx);
+        });
+      }
+
+      window.setDeckTop = function(idx) {
+        const total = (appData.projects || []).slice(0, 3).length;
+        if (!total) return;
+        deckTopIdx = ((idx % total) + total) % total;
+        applyDeckOrder();
+      };
+
+      window.cycleDeckPrev = function() {
+        const total = (appData.projects || []).slice(0, 3).length;
+        if (!total) return;
+        deckTopIdx = (deckTopIdx - 1 + total) % total;
+        applyDeckOrder();
+      };
+
+      window.cycleDeckNext = function() {
+        const total = (appData.projects || []).slice(0, 3).length;
+        if (!total) return;
+        deckTopIdx = (deckTopIdx + 1) % total;
+        applyDeckOrder();
+      };
 
       let currentProjectIdx = 0;
       window.openProjModal = function(idx) {
