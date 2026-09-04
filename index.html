@@ -1109,6 +1109,52 @@
       .section-title { font-size: 18pt !important; color: #000 !important; }
       .hero { padding-top: 0 !important; min-height: auto !important; }
     }
+
+    /* ===== PDF 一键导出:文档化白底渲染(JS 把 main 移入 .pdf-mode 容器后导出,完成后移回) ===== */
+    .pdf-mode {
+      width: 800px !important; max-width: 800px !important;
+      box-sizing: border-box; padding: 0 18px !important;
+      margin: 0 auto; background: #FFFFFF; color: #111;
+      --bg: #FFFFFF !important; --bg-alt: #FFFFFF !important;
+      --surface: #FFFFFF !important; --surface-hover: #FFFFFF !important;
+      --border: #D8DEE6 !important; --border-strong: #B6BEC9 !important;
+      --text-main: #101828 !important; --text-muted: #384152 !important; --text-dim: #5B6472 !important;
+      --primary: #0F5FA8 !important; --accent: #4F46E5 !important;
+      --pill-bg: rgba(15, 23, 42, 0.05) !important; --pill-border: #CBD5E1 !important;
+      --pill-hover: rgba(15, 23, 42, 0.09) !important;
+    }
+    .pdf-mode section, .pdf-mode main { background: #FFFFFF !important; }
+    .pdf-mode .hero { padding: 48px 0 42px !important; min-height: auto !important; }
+    .pdf-mode .bg-watermark,
+    .pdf-mode .status-badge,
+    .pdf-mode .btn-group,
+    .pdf-mode .icon-btn,
+    .pdf-mode .deck-arrow-btn,
+    .pdf-mode .modal-overlay { display: none !important; }
+    .pdf-mode .card, .pdf-mode .stat-card, .pdf-mode .project-card,
+    .pdf-mode .contact-card {
+      background: #FFFFFF !important;
+      border: 1px solid #E2E8F0 !important;
+      box-shadow: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    .pdf-mode .spotlight::before, .pdf-mode .spotlight::after { display: none !important; }
+    .pdf-mode .hero-grid,
+    .pdf-mode .about-grid,
+    .pdf-mode .charts-grid,
+    .pdf-mode .stat-grid,
+    .pdf-mode .certs-grid,
+    .pdf-mode .exp-tabs,
+    .pdf-mode .contact-grid,
+    .pdf-mode .skill-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+    .pdf-mode .hero-grid { text-align: center; gap: 14px !important; }
+    .pdf-mode .hero-content { align-items: center !important; }
+    .pdf-mode .avatar-wrapper { margin: 0 auto 14px; }
+    .pdf-mode .badge-group { justify-content: center; }
+    .pdf-mode .hero-pill, .pdf-mode .hero-name,
+    .pdf-mode .hero-sub, .pdf-mode .hero-intro { text-align: center; }
+    .pdf-mode .section-header { text-align: center !important; }
   </style>
 </head>
 <body>
@@ -1154,7 +1200,7 @@
         <button class="icon-btn" id="themeToggle" title="切换黑/白主题" aria-label="切换黑/白主题">
           <svg viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
         </button>
-        <button class="icon-btn" onclick="window.print()" title="导出 / 打印 PDF" aria-label="导出 PDF">
+        <button class="icon-btn" onclick="downloadPdf()" title="导出 / 打印 PDF" aria-label="导出 PDF">
           <svg viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z"/></svg>
         </button>
         <button class="icon-btn" id="openAdminBtn" title="管理内容 (Ctrl+M)" aria-label="管理内容">
@@ -1210,7 +1256,7 @@
                 <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
                 GitHub 个人主页
               </a>
-              <button class="btn btn-outline" onclick="window.print()">
+              <button class="btn btn-outline" onclick="downloadPdf()">
                 <svg viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 PDF 简历
               </button>
@@ -1422,7 +1468,7 @@
           <div class="btn-group" style="justify-content:center; margin-top:24px;">
             <button class="btn btn-primary" id="copyEmailBtn2">复制电子邮箱</button>
             <a class="btn btn-outline" id="githubBtn2" href="#" target="_blank" rel="noopener">GitHub 个人主页</a>
-            <button class="btn btn-outline" onclick="window.print()">下载 PDF 简历</button>
+            <button class="btn btn-outline" onclick="downloadPdf()">下载 PDF 简历</button>
           </div>
         </div>
       </div>
@@ -2354,6 +2400,90 @@
         setTimeout(()=> t.classList.remove('show'), 2500);
       }
 
+      /* ===== 一键下载 PDF:把 main 临时移入 .pdf-mode 容器渲染成 .pdf 下载,完成后移回原位 ===== */
+      let __pdfBusy = false;
+      window.downloadPdf = function () {
+        if (__pdfBusy) return;
+        if (typeof window.html2pdf === 'undefined') {
+          showToast('PDF 组件加载失败,改用系统打印…');
+          setTimeout(function(){ try { window.print(); } catch(e){} }, 400);
+          return;
+        }
+        __pdfBusy = true;
+
+        // 1) 遮罩反馈
+        const ov = document.createElement('div');
+        ov.id = 'pdfOverlay';
+        ov.style.cssText = 'position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:rgba(10,14,20,.78);color:#fff;font:14px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;backdrop-filter:blur(6px);text-align:center;padding:0 20px;';
+        ov.innerHTML = '<div style="width:46px;height:46px;border:4px solid rgba(255,255,255,.25);border-top-color:#38BDF8;border-radius:50%;animation:pdfspin .9s linear infinite;"></div><div>正在生成 PDF,请稍候…</div>';
+        const st = document.createElement('style');
+        st.textContent = '@keyframes pdfspin{to{transform:rotate(360deg)}}';
+        document.head.appendChild(st);
+        document.body.appendChild(ov);
+
+        // 2) 取出 main 原节点,移入 .pdf-mode 容器(保留 canvas/图片;生成期间被遮罩覆盖)
+        const mainEl = document.getElementById('home') ? document.getElementById('home').parentElement : null;
+        if (!mainEl) {
+          showToast('未找到内容区域');
+          ov.remove(); st.remove(); __pdfBusy = false;
+          return;
+        }
+        const mainParent = mainEl.parentNode;
+        const nextSib = mainEl.nextSibling;
+        const lastScrollY = window.pageYOffset || 0;
+        const finish = function () {
+          try {
+            if (mainEl.parentNode === pc) pc.removeChild(mainEl);
+            if (pc.parentNode) pc.parentNode.removeChild(pc);
+            if (mainParent) mainParent.insertBefore(mainEl, nextSib);
+            try { window.scrollTo(0, lastScrollY); } catch(e2){}
+          } catch(e3){}
+        };
+        try { window.scrollTo(0, 0); } catch(e){}
+        const pc = document.createElement('div');
+        pc.className = 'pdf-mode';
+        pc.id = 'pdfPrintContainer';
+        pc.style.cssText = 'position:relative;width:800px;margin:0 auto;background:#fff;color:#111;';
+        mainParent.removeChild(mainEl);
+        mainParent.insertBefore(pc, nextSib);
+        pc.appendChild(mainEl);
+        document.querySelectorAll('.reveal:not(.active), .reveal-left:not(.active), .reveal-right:not(.active), [data-pos]:not(.active)').forEach(function (el) {
+          if (el.classList) el.classList.add('active');
+        });
+
+        // 3) 渲染并下载
+        requestAnimationFrame(function () {
+          setTimeout(function () {
+            const opt = {
+              margin: [8, 8, 12, 8],
+              filename: '付宽镇-个人简历.pdf',
+              image: { type: 'jpeg', quality: 0.95 },
+              html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+              jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+              pagebreak: { mode: ['css', 'legacy'], avoid: ['.card', '.stat-card', '.project-card', '.cert-thumb', '.contact-card', '.tag-cloud', '.info-list'] }
+            };
+            html2pdf().set(opt).from(pc).save()
+              .then(function () {
+                ov.querySelectorAll('div')[1].textContent = 'PDF 已生成,开始下载 ✓';
+                setTimeout(function () { showToast('PDF 已开始下载 ✓'); }, 200);
+              })
+              .catch(function (err) {
+                console.error('PDF 导出失败:', err);
+                ov.querySelectorAll('div')[1].textContent = '自动生成失败,改用系统打印…';
+                setTimeout(function () { try { window.print(); } catch(e){} }, 400);
+              })
+              .finally(function () {
+                setTimeout(function () {
+                  finish();
+                  if (ov.parentNode) ov.parentNode.removeChild(ov);
+                  if (st.parentNode) st.parentNode.removeChild(st);
+                  __pdfBusy = false;
+                }, 1800);
+              });
+          }, 120);
+        });
+      };
+
       document.getElementById('openAdminBtn').onclick = () => {
         openModal('pinModal');
       };
@@ -2705,5 +2835,6 @@
       renderAll();
     })();
   </script>
+  <script src="html2pdf.bundle.min.js"></script>
 </body>
 </html>
