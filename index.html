@@ -1699,16 +1699,6 @@
         },
         projects: [
           {
-            title: 'AI 与 Agent 编程：数据全景 2026',
-            type: 'PPT 演示 & 网页',
-            role: '信息设计与前端交互',
-            intro: '面向 AI 与 Agent 编程的 10 页高视觉冲击力数据报告，涵盖市场规模、工具格局、效率证据五维结构。',
-            tech: ['信息设计', '数据可视化', 'HTML/CSS'],
-            contributions: ['独立完成 10 页排版及网页端响应式翻页演示', '结构化呈现 30+ 项数据指标'],
-            demo: 'https://wen-6-dao.github.io/resume-ppt/ppt.html',
-            source: 'https://github.com/wen-6-dao/resume-ppt'
-          },
-          {
             title: '像素坦克：废土突围',
             type: 'H5 独立游戏',
             role: '独立全栈开发',
@@ -1817,7 +1807,8 @@
       let appData = clone(DEFAULT_DATA);
       // 已被移除的项目 demo 列表（用于过滤旧 localStorage 缓存，确保被删除的项目不会再显示）
       const REMOVED_PROJECT_DEMOS = new Set([
-        'https://wen-6-dao.github.io/hntky-crawler/'
+        'https://wen-6-dao.github.io/hntky-crawler/',
+        'https://wen-6-dao.github.io/resume-ppt/ppt.html'
       ]);
 
       try {
